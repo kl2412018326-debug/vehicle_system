@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Vehicle Service Maintenance System - Multi-Role Account System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #0f172a;
+            --accent-color: #06b6d4;
+            --bg-light: #f8fafc;
+            --card-border: #e2e8f0;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        /* Auth Container Styling */
+        .auth-card {
+            max-width: 480px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Top Navbar */
+        .navbar-brand-title {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .avatar-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Sidebar Styling */
+        .sidebar-container {
+            width: 260px;
+            min-height: calc(100vh - 66px);
+            background: #ffffff;
+            border-right: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link-custom {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            color: #475569;
+            font-weight: 500;
+            border-radius: 10px;
+            margin: 4px 12px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .nav-link-custom:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        .nav-link-custom.active {
+            background-color: #eff6ff;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Cards & Gauges */
+        .stat-card {
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        .icon-shape {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .health-gauge-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+        }
+
+        .health-score-val {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .health-score-val .number {
+            font-size: 2.25rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.4em 0.8em;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background-color: #fef3c7; color: #d97706; }
+        .status-in-progress { background-color: #e0f2fe; color: #0284c7; }
+        .status-completed { background-color: #dcfce7; color: #16a34a; }
+        .status-danger { background-color: #fee2e2; color: #dc2626; }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        @media (max-width: 991.98px) {
+            .sidebar-container {
+                width: 100%;
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUTHENTICATION SCREEN CONTAINER -->
+    <div id="authScreen" class="min-vh-100 d-flex align-items-center justify-content-center p-3 bg-gradient" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+        <div class="card auth-card border-0 p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="bg-primary text-white rounded-3 p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 54px; height: 54px;">
+                    <i class="fa-solid fa-car-wrench fs-3"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-1">SmartAuto AI</h4>
+                <p class="text-muted small mb-0">Vehicle Maintenance & AI Predictive Diagnostics</p>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="loginFormContainer">
+                <form onsubmit="handleLogin(event)">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                            <input type="email" class="form-control border-start-0 bg-light" id="loginEmail" required placeholder="name@domain.com">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control border-start-0 bg-light" id="loginPassword" required placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm mb-3">Sign In to Dashboard</button>
+                </form>
+
+                <div class="text-center">
+                    <span class="small text-muted">Don't have an account? </span>
+                    <a href="#" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('register')">Register Now</a>
+                </div>
+
+                <!-- PRESET DEMO ACCOUNTS QUICK LOGIN -->
+                <div class="mt-4 pt-3 border-top text-center">
+                    <small class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 0.7rem;">Quick Demo Login Accounts</small>
+                    <div class="d-flex flex-wrap gap-1 justify-content-center">
+                        <button class="btn btn-outline-danger btn-xs py-1 px-2 rounded-2" style="font-size: 0.75rem;" onclick="quickLogin('admin@uptm.edu.my')"><i class="fa-solid fa-user-shield me-1"></i> Admin</button>
+                        <button class="btn btn-outline-warning btn-xs py-1 px-2 rounded-2" style="font-size: 0.75rem;" onclick="quickLogin('mechanic@uptm.edu.my')"><i class="fa-solid fa-wrench me-1"></i> Mechanic</button>
+                        <button class="btn btn-outline-primary btn-xs py-1 px-2 rounded-2" style="font-size: 0.75rem;" onclick="quickLogin('customer@uptm.edu.my')"><i class="fa-solid fa-user me-1"></i> Customer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTRATION FORM WITH ADMIN REGISTRATION SUPPORT -->
+            <div id="registerFormContainer" class="d-none">
+                <form onsubmit="handleRegistration(event)">
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Full Name</label>
+                        <input type="text" class="form-control bg-light" id="regName" required placeholder="Full Name">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Email Address</label>
+                        <input type="email" class="form-control bg-light" id="regEmail" required placeholder="name@domain.com">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Phone Number</label>
+                        <input type="text" class="form-control bg-light" id="regPhone" required placeholder="012-3456789">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Account Role Type</label>
+                        <select class="form-select bg-light" id="regRole" onchange="toggleRoleFields(this.value)" required>
+                            <option value="customer">Vehicle Owner (Customer)</option>
+                            <option value="mechanic">Workshop Mechanic / Technician</option>
+                            <option value="admin">Workshop Administrator (Admin)</option>
+                        </select>
+                    </div>
+
+                    <!-- DYNAMIC ADMIN FIELDS -->
+                    <div id="adminRegFields" class="p-3 bg-danger-subtle rounded-3 mb-2 d-none border border-danger-subtle">
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-danger"><i class="fa-solid fa-shield-halved me-1"></i> Admin Security Code</label>
+                            <input type="password" class="form-control bg-white" id="regAdminKey" placeholder="Enter key (Default: UPTM2026)">
+                            <small class="text-muted" style="font-size: 0.68rem;">* Use <b>UPTM2026</b> or <b>ADMIN123</b> to authorize admin registration.</small>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label small fw-bold text-danger"><i class="fa-solid fa-warehouse me-1"></i> Workshop / Branch Name</label>
+                            <input type="text" class="form-control bg-white" id="regBranch" placeholder="e.g. UPTM Main Auto Workshop">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Password</label>
+                        <input type="password" class="form-control bg-light" id="regPassword" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3 shadow-sm mb-3">Create Personal Account</button>
+                </form>
+
+                <div class="text-center">
+                    <span class="small text-muted">Already registered? </span>
+                    <a href="#" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('login')">Back to Login</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION WRAPPER (HIDDEN UNTIL AUTHENTICATED) -->
+    <div id="appContainer" class="d-none">
+        
+        <!-- TOP NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-2 px-3">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                    <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="fa-solid fa-car-wrench me-0"></i>
+                    </div>
+                    <span class="navbar-brand-title fs-5">SmartAuto AI</span>
+                </a>
+
+                <div class="d-flex align-items-center gap-3 ms-auto">
+                    <!-- LOGGED IN USER PROFILE SUMMARY -->
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="avatar-circle" id="navAvatarCircle">A</div>
+                        <div class="d-none d-md-block text-start">
+                            <div class="fw-bold fs-7 lh-1" id="navUserName">User Name</div>
+                            <span class="badge bg-primary-subtle text-primary border rounded-pill mt-1" id="navUserRoleBadge" style="font-size: 0.68rem;">CUSTOMER</span>
+                        </div>
+                    </div>
+
+                    <!-- USER SETTINGS & LOGOUT DROPDOWN -->
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm rounded-circle p-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2">
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#" onclick="openProfileModal()"><i class="fa-solid fa-user-gear text-primary"></i> Edit Profile Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out Account</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="d-flex flex-column flex-lg-row">
+            <!-- SIDEBAR NAV MENU -->
+            <div class="sidebar-container py-3" id="sidebarMenu">
+                <!-- Dynamically populated based on active user role -->
+            </div>
+
+            <!-- MAIN DISPLAY CONTENT -->
+            <main class="flex-grow-1 p-3 p-md-4" style="max-width: 1600px;">
+                <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055;"></div>
+
+                <!-- ROLE 1: ADMIN DASHBOARD VIEW -->
+                <div id="adminView" class="role-view d-none">
+                    <div class="p-3 bg-primary text-white rounded-3 mb-4 d-flex justify-content-between align-items-center shadow-sm">
+                        <div>
+                            <h5 class="fw-bold mb-0" id="adminBranchTitle"><i class="fa-solid fa-warehouse me-2"></i>UPTM Main Workshop Admin Portal</h5>
+                            <small class="text-white-50">Central Control Panel & System Diagnostics</small>
+                        </div>
+                        <span class="badge bg-white text-primary fw-bold" id="adminAccountBadge">Admin Account Active</span>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card p-3 d-flex align-items-center gap-3">
+                                <div class="icon-shape bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-medium">Total Customers</div>
+                                    <h4 class="mb-0 fw-bold" id="adminTotalCustomers">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card p-3 d-flex align-items-center gap-3">
+                                <div class="icon-shape bg-info-subtle text-info"><i class="fa-solid fa-car"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-medium">Vehicles Registered</div>
+                                    <h4 class="mb-0 fw-bold" id="adminTotalVehicles">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card p-3 d-flex align-items-center gap-3">
+                                <div class="icon-shape bg-warning-subtle text-warning"><i class="fa-solid fa-calendar-check"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-medium">Pending Appointments</div>
+                                    <h4 class="mb-0 fw-bold" id="adminPendingApps">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card p-3 d-flex align-items-center gap-3">
+                                <div class="icon-shape bg-success-subtle text-success"><i class="fa-solid fa-sack-dollar"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-medium">Total Revenue</div>
+                                    <h4 class="mb-0 fw-bold" id="adminTotalRevenue">RM 0.00</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Analytics Charts -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-lg-8">
+                            <div class="stat-card p-3 p-md-4 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0"><i class="fa-solid fa-chart-line text-primary me-2"></i>Workshop Revenue Analytics</h6>
+                                    <span class="badge bg-light text-dark border">Financial Performance</span>
+                                </div>
+                                <div style="height: 260px;"><canvas id="adminRevenueChart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="stat-card p-3 p-md-4 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie text-info me-2"></i>AI Fleet Condition Index</h6>
+                                    <span class="badge bg-light text-dark border">Real-time Health</span>
+                                </div>
+                                <div style="height: 260px;" class="d-flex align-items-center justify-content-center"><canvas id="adminHealthChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin CRUD Table -->
+                    <div class="stat-card p-3 p-md-4 mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <h5 class="fw-bold mb-0" id="adminSectionTitle">Customer Accounts Management</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr id="adminTableHead"></tr></thead>
+                                <tbody id="adminTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROLE 2: MECHANIC DASHBOARD VIEW -->
+                <div id="mechanicView" class="role-view d-none">
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-4">
+                            <div class="stat-card p-3 border-start border-4 border-warning">
+                                <small class="text-muted fw-bold">MY ASSIGNED JOBS</small>
+                                <h3 class="mb-0 fw-bold mt-1" id="mechAssignedCount">0</h3>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="stat-card p-3 border-start border-4 border-info">
+                                <small class="text-muted fw-bold">IN PROGRESS</small>
+                                <h3 class="mb-0 fw-bold mt-1" id="mechInProgressCount">0</h3>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="stat-card p-3 border-start border-4 border-success">
+                                <small class="text-muted fw-bold">COMPLETED BY ME</small>
+                                <h3 class="mb-0 fw-bold mt-1" id="mechCompletedCount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card p-3 p-md-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i>My Personal Service Work Orders</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Work Order ID</th>
+                                        <th>Vehicle & Plate</th>
+                                        <th>Service Required</th>
+                                        <th>Customer Name</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mechanicTasksTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROLE 3: CUSTOMER PORTAL VIEW -->
+                <div id="customerView" class="role-view d-none">
+                    
+                    <!-- GARAGE VEHICLE SELECTOR & ADD VEHICLE HEADER -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 bg-white stat-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="icon-shape bg-primary text-white"><i class="fa-solid fa-car"></i></div>
+                            <div>
+                                <small class="text-muted d-block fw-bold" style="font-size: 0.7rem;">MY GARAGE VEHICLE</small>
+                                <select class="form-select border-0 bg-transparent fw-bold fs-5 p-0 pe-4" id="customerVehicleSelect" onchange="switchCustomerVehicle(this.value)">
+                                    <!-- Options populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm rounded-3" onclick="openAddVehicleModal()">
+                            <i class="fa-solid fa-circle-plus me-1"></i> Add Vehicle to My Account
+                        </button>
+                    </div>
+
+                    <!-- Health Gauge & AI Components -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-lg-5">
+                            <div class="stat-card p-4 text-center h-100 d-flex flex-column justify-content-center align-items-center">
+                                <h6 class="fw-bold text-muted mb-3"><i class="fa-solid fa-heart-pulse text-danger me-2"></i>AI Vehicle Health Score</h6>
+                                <div class="health-gauge-container mb-3">
+                                    <canvas id="healthScoreGauge"></canvas>
+                                    <div class="health-score-val">
+                                        <div class="number" id="healthScoreValue">--%</div>
+                                        <small class="text-muted fw-semibold" id="healthScoreLabel">STATUS</small>
+                                    </div>
+                                </div>
+                                <p class="small text-muted mb-0" id="healthScoreSummary">Diagnostic score calculated dynamically.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-7">
+                            <div class="stat-card p-4 h-100">
+                                <h6 class="fw-bold mb-3"><i class="fa-solid fa-microchip text-primary me-2"></i>AI Predictive Maintenance Diagnostic Breakdown</h6>
+                                <div class="row g-3" id="componentBreakdownContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cost Estimator & Dynamic QR Code -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <div class="stat-card p-4 h-100">
+                                <h6 class="fw-bold mb-3"><i class="fa-solid fa-calculator text-success me-2"></i>AI Maintenance Cost Estimator</h6>
+                                <div class="p-3 bg-light rounded-3 mb-3 border">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="fw-semibold small"><i class="fa-solid fa-bell text-warning me-2"></i>Smart AI Service Reminder</span>
+                                        <span class="badge bg-danger">Predictive Alert</span>
+                                    </div>
+                                    <p class="small text-muted mb-1" id="customerReminderText">Based on mileage, oil change recommended soon.</p>
+                                </div>
+
+                                <label class="form-label fw-bold small">Select Maintenance Service:</label>
+                                <select class="form-select mb-3" id="costEstimatorSelect" onchange="calculateEstimate()">
+                                    <option value="250">Synthetic Oil Change + Filter Package (RM 250)</option>
+                                    <option value="480">Full Brake System Overhaul & Pads (RM 480)</option>
+                                    <option value="850">Major Service (Plugs, Transmission Flush, Oil) (RM 850)</option>
+                                    <option value="1200">Air-Con Compressor & Suspension Check (RM 1,200)</option>
+                                </select>
+
+                                <div class="d-flex justify-content-between align-items-center p-3 bg-primary-subtle text-primary rounded-3">
+                                    <div>
+                                        <small class="d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Estimated Cost</small>
+                                        <span class="h4 fw-bold mb-0" id="estimatedCostDisplay">RM 250.00</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm rounded-3 px-3" onclick="openBookAppointmentModal()">Book Service</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="stat-card p-4 h-100 text-center d-flex flex-column align-items-center justify-content-center">
+                                <h6 class="fw-bold mb-2"><i class="fa-solid fa-qrcode text-dark me-2"></i>Digital Vehicle Health Passport</h6>
+                                <p class="small text-muted mb-3">Scan this official UPTM QR code to verify service records on mobile.</p>
+                                <div id="qrcode" class="p-3 bg-white border rounded-3 mb-2 shadow-sm"></div>
+                                <small class="fw-bold text-primary" id="qrVinDisplay">VIN: ---</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Service Records -->
+                    <div class="stat-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Vehicle Maintenance History</h5>
+                            <button class="btn btn-outline-primary btn-sm rounded-3" onclick="openBookAppointmentModal()"><i class="fa-solid fa-calendar-plus me-1"></i> Book Appointment</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Service Type</th>
+                                        <th>Mileage Recorded</th>
+                                        <th>Mechanic Diagnostic Notes</th>
+                                        <th>Total Paid</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customerServiceTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL 1: PROFILE SETTINGS MODAL -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Personal Profile Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm" onsubmit="saveProfileSettings(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Full Name</label>
+                            <input type="text" class="form-control" id="profileName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Email Address</label>
+                            <input type="email" class="form-control" id="profileEmail" required readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Phone Number</label>
+                            <input type="text" class="form-control" id="profilePhone" required>
+                        </div>
+                        <div class="mb-3" id="profileBranchContainer">
+                            <label class="form-label small fw-bold">Workshop / Branch Name</label>
+                            <input type="text" class="form-control" id="profileBranch">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Account Role</label>
+                            <input type="text" class="form-control bg-light" id="profileRole" readonly>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-3">Update Personal Details</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD VEHICLE TO CUSTOMER ACCOUNT MODAL -->
+    <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Register Vehicle to My Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addVehicleForm" onsubmit="submitAddVehicle(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">License Plate Number</label>
+                            <input type="text" class="form-control" id="vehPlate" required placeholder="e.g. VEE 8821">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Brand & Model</label>
+                            <input type="text" class="form-control" id="vehBrandModel" required placeholder="e.g. Honda Civic 1.5 Turbo">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Current Odometer Mileage (km)</label>
+                            <input type="number" class="form-control" id="vehMileage" required placeholder="65000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">VIN / Chassis Number</label>
+                            <input type="text" class="form-control" id="vehVin" required placeholder="e.g. WBA334812904812">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-3">Add Vehicle to Garage</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ASSIGN MECHANIC MODAL (ADMIN) -->
+    <div class="modal fade" id="assignMechanicModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Assign Mechanic to Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="assignAptId">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Select Workshop Mechanic</label>
+                        <select class="form-select" id="assignMechanicSelect"></select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-primary btn-sm rounded-3" onclick="confirmAssignMechanic()">Assign Job</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: MECHANIC WORK ORDER UPDATE -->
+    <div class="modal fade" id="mechanicModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Update Repair & Service Finding</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="mechanicUpdateForm">
+                        <input type="hidden" id="mechTaskId">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Job Status</label>
+                            <select class="form-select" id="mechStatusSelect">
+                                <option value="In Progress">In Progress</option>
+                                <option value="Pending Parts">Pending Parts</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Diagnostic Findings / Notes</label>
+                            <textarea class="form-control" id="mechNotes" rows="3" placeholder="Enter engine diagnostic findings..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Select Spare Part Used</label>
+                            <select class="form-select" id="mechPartSelect"></select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-success btn-sm rounded-3" onclick="saveMechanicUpdate()">Save & Log Service</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: CUSTOMER BOOK SERVICE MODAL -->
+    <div class="modal fade" id="customerBookModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Book Service Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookAppForm">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Preferred Date</label>
+                            <input type="date" class="form-control" id="bookDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Service Package</label>
+                            <select class="form-select" id="bookServiceType">
+                                <option value="Synthetic Oil Change">Synthetic Oil Change (RM 250)</option>
+                                <option value="Brake System Inspection">Brake System Inspection (RM 480)</option>
+                                <option value="Major Engine Service">Major Engine Service (RM 850)</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-primary btn-sm rounded-3" onclick="submitCustomerBooking()">Confirm Appointment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ==========================================
+        // SYSTEM DATABASE & LOCAL STORAGE PERSISTENCE
+        // ==========================================
+        
+        const DEFAULT_DATABASE = {
+            users: [
+                { id: 1, name: 'Main Admin', email: 'admin@uptm.edu.my', password: 'pass', role: 'admin', phone: '03-92814000', branch: 'UPTM Central Workshop' },
+                { id: 2, name: 'Encik Kamal Rosli', email: 'mechanic@uptm.edu.my', password: 'pass', role: 'mechanic', phone: '019-3344556', specialty: 'Engine Diagnostics' },
+                { id: 3, name: 'Muhammad Aqil', email: 'customer@uptm.edu.my', password: 'pass', role: 'customer', phone: '012-8899100' },
+                { id: 4, name: 'Siti Nurhaliza', email: 'siti@owner.com', password: 'pass', role: 'customer', phone: '017-2233445' }
+            ],
+            vehicles: [
+                { id: 1, plate: 'VEE 8821', brandModel: 'Honda Civic 1.5 Turbo', year: 2021, mileage: 64200, vin: 'WBA334812904812', ownerEmail: 'customer@uptm.edu.my', healthScore: 88 },
+                { id: 2, plate: 'BQK 1920', brandModel: 'Toyota Camry 2.5 V', year: 2019, mileage: 112000, vin: 'JTE290184019283', ownerEmail: 'siti@owner.com', healthScore: 62 },
+                { id: 3, plate: 'WYY 4040', brandModel: 'Perodua Myvi 1.5 AV', year: 2022, mileage: 31000, vin: 'PMV881920192831', ownerEmail: 'customer@uptm.edu.my', healthScore: 95 }
+            ],
+            appointments: [
+                { id: 501, customerEmail: 'customer@uptm.edu.my', customerName: 'Muhammad Aqil', vehiclePlate: 'VEE 8821', service: 'Brake System Inspection', date: '2026-10-02', status: 'In Progress', mechanicEmail: 'mechanic@uptm.edu.my' },
+                { id: 502, customerEmail: 'siti@owner.com', customerName: 'Siti Nurhaliza', vehiclePlate: 'BQK 1920', service: 'Major Engine Service', date: '2026-10-05', status: 'Pending', mechanicEmail: '' }
+            ],
+            serviceRecords: [
+                { id: 901, date: '2026-08-14', vehiclePlate: 'VEE 8821', service: 'Synthetic Oil Change', mileage: 58000, notes: 'Engine oil filter changed. Condition optimal.', cost: 250, status: 'Completed' },
+                { id: 902, date: '2026-05-10', vehiclePlate: 'VEE 8821', service: 'Transmission Fluid Flush', mileage: 48000, notes: 'Transmission fluid replaced.', cost: 380, status: 'Completed' }
+            ],
+            spareParts: [
+                { id: 1, name: 'Fully Synthetic Oil 5W-30', qty: 24, unitPrice: 180 },
+                { id: 2, name: 'Brake Pad Set (Front)', qty: 8, unitPrice: 160 },
+                { id: 3, name: 'NGK Spark Plugs', qty: 45, unitPrice: 35 }
+            ]
+        };
+
+        function getDB() {
+            const data = localStorage.getItem('uptm_smartauto_db');
+            if (!data) {
+                localStorage.setItem('uptm_smartauto_db', JSON.stringify(DEFAULT_DATABASE));
+                return DEFAULT_DATABASE;
+            }
+            return JSON.parse(data);
+        }
+
+        function saveDB(db) {
+            localStorage.setItem('uptm_smartauto_db', JSON.stringify(db));
+        }
+
+        // Current Session Handles
+        let currentUser = null;
+        let currentAdminTab = 'customers';
+        let selectedCustomerPlate = '';
+
+        // Chart Global Instances
+        let revenueChartInstance = null;
+        let healthChartInstance = null;
+        let gaugeChartInstance = null;
+        let qrcodeInstance = null;
+
+        window.onload = function() {
+            const session = localStorage.getItem('uptm_smartauto_session');
+            if (session) {
+                currentUser = JSON.parse(session);
+                showAppDashboard();
+            } else {
+                document.getElementById('authScreen').classList.remove('d-none');
+                document.getElementById('appContainer').classList.add('d-none');
+            }
+        };
+
+        // ==========================================
+        // AUTHENTICATION & MULTI-ROLE REGISTRATION
+        // ==========================================
+        function toggleAuthMode(mode) {
+            if (mode === 'register') {
+                document.getElementById('loginFormContainer').classList.add('d-none');
+                document.getElementById('registerFormContainer').classList.remove('d-none');
+            } else {
+                document.getElementById('registerFormContainer').classList.add('d-none');
+                document.getElementById('loginFormContainer').classList.remove('d-none');
+            }
+        }
+
+        function toggleRoleFields(role) {
+            const adminFields = document.getElementById('adminRegFields');
+            if (role === 'admin') {
+                adminFields.classList.remove('d-none');
+            } else {
+                adminFields.classList.add('d-none');
+            }
+        }
+
+        function quickLogin(email) {
+            document.getElementById('loginEmail').value = email;
+            document.getElementById('loginPassword').value = 'pass';
+            handleLogin(new Event('submit'));
+        }
+
+        function handleLogin(e) {
+            if(e) e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+
+            const db = getDB();
+            const foundUser = db.users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === pass);
+
+            if (foundUser) {
+                currentUser = foundUser;
+                localStorage.setItem('uptm_smartauto_session', JSON.stringify(foundUser));
+                showAppDashboard();
+                showToast(`Welcome back, ${currentUser.name}!`);
+            } else {
+                alert('Invalid email or password! Check your inputs or try demo accounts.');
+            }
+        }
+
+        function handleRegistration(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const role = document.getElementById('regRole').value;
+            const password = document.getElementById('regPassword').value;
+
+            // Admin Authorization Check
+            if (role === 'admin') {
+                const key = document.getElementById('regAdminKey').value.trim();
+                if (key !== 'UPTM2026' && key !== 'ADMIN123' && key !== '') {
+                    alert('Invalid Admin Security Code! Access Denied.');
+                    return;
+                }
+            }
+
+            const db = getDB();
+            if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+                alert('An account with this email address already exists!');
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                phone,
+                role,
+                password,
+                branch: role === 'admin' ? (document.getElementById('regBranch').value || 'UPTM Main Workshop') : undefined
+            };
+
+            db.users.push(newUser);
+            saveDB(db);
+
+            currentUser = newUser;
+            localStorage.setItem('uptm_smartauto_session', JSON.stringify(newUser));
+            showAppDashboard();
+            showToast(`New ${role.toUpperCase()} personal account registered successfully!`);
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('uptm_smartauto_session');
+            currentUser = null;
+            document.getElementById('appContainer').classList.add('d-none');
+            document.getElementById('authScreen').classList.remove('d-none');
+        }
+
+        // ==========================================
+        // MAIN APPLICATION DASHBOARD ROUTER
+        // ==========================================
+        function showAppDashboard() {
+            document.getElementById('authScreen').classList.add('d-none');
+            document.getElementById('appContainer').classList.remove('d-none');
+
+            // Header profile info update
+            document.getElementById('navUserName').textContent = currentUser.name;
+            document.getElementById('navUserRoleBadge').textContent = currentUser.role.toUpperCase();
+            document.getElementById('navAvatarCircle').textContent = currentUser.name.charAt(0).toUpperCase();
+
+            // Hide views
+            document.querySelectorAll('.role-view').forEach(el => el.classList.add('d-none'));
+
+            renderSidebar();
+
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminView').classList.remove('d-none');
+                renderAdminDashboard();
+            } else if (currentUser.role === 'mechanic') {
+                document.getElementById('mechanicView').classList.remove('d-none');
+                renderMechanicDashboard();
+            } else if (currentUser.role === 'customer') {
+                document.getElementById('customerView').classList.remove('d-none');
+                renderCustomerDashboard();
+            }
+        }
+
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            let html = '';
+
+            if (currentUser.role === 'admin') {
+                html = `
+                    <div class="px-3 mb-2 text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Admin Workspace</div>
+                    <a class="nav-link-custom ${currentAdminTab === 'customers' ? 'active' : ''}" href="#" onclick="setAdminTab('customers')"><i class="fa-solid fa-users"></i> Customer Accounts</a>
+                    <a class="nav-link-custom ${currentAdminTab === 'vehicles' ? 'active' : ''}" href="#" onclick="setAdminTab('vehicles')"><i class="fa-solid fa-car"></i> Fleet Registry</a>
+                    <a class="nav-link-custom ${currentAdminTab === 'mechanics' ? 'active' : ''}" href="#" onclick="setAdminTab('mechanics')"><i class="fa-solid fa-user-gear"></i> Mechanics Roster</a>
+                    <a class="nav-link-custom ${currentAdminTab === 'appointments' ? 'active' : ''}" href="#" onclick="setAdminTab('appointments')"><i class="fa-solid fa-calendar-alt"></i> Service Appointments</a>
+                    <a class="nav-link-custom ${currentAdminTab === 'parts' ? 'active' : ''}" href="#" onclick="setAdminTab('parts')"><i class="fa-solid fa-boxes-stacked"></i> Spare Parts Inventory</a>
+                `;
+            } else if (currentUser.role === 'mechanic') {
+                html = `
+                    <div class="px-3 mb-2 text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Technician Workbench</div>
+                    <a class="nav-link-custom active" href="#"><i class="fa-solid fa-screwdriver-wrench"></i> My Work Orders</a>
+                `;
+            } else if (currentUser.role === 'customer') {
+                html = `
+                    <div class="px-3 mb-2 text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Vehicle Owner Portal</div>
+                    <a class="nav-link-custom active" href="#"><i class="fa-solid fa-gauge-high"></i> Dashboard & Diagnostics</a>
+                    <a class="nav-link-custom" href="#" onclick="openBookAppointmentModal()"><i class="fa-solid fa-calendar-plus"></i> Book Service</a>
+                `;
+            }
+
+            sidebar.innerHTML = html;
+        }
+
+        // ==========================================
+        // ADMIN DASHBOARD LOGIC
+        // ==========================================
+        function setAdminTab(tab) {
+            currentAdminTab = tab;
+            renderSidebar();
+            renderAdminDashboard();
+        }
+
+        function renderAdminDashboard() {
+            const db = getDB();
+
+            document.getElementById('adminBranchTitle').innerHTML = `<i class="fa-solid fa-warehouse me-2"></i>${currentUser.branch || 'UPTM Workshop'} Admin Portal`;
+            document.getElementById('adminAccountBadge').textContent = `Admin: ${currentUser.name}`;
+
+            document.getElementById('adminTotalCustomers').textContent = db.users.filter(u => u.role === 'customer').length;
+            document.getElementById('adminTotalVehicles').textContent = db.vehicles.length;
+            document.getElementById('adminPendingApps').textContent = db.appointments.filter(a => a.status === 'Pending' || a.status === 'In Progress').length;
+            
+            const totalRev = db.serviceRecords.reduce((sum, item) => sum + item.cost, 0);
+            document.getElementById('adminTotalRevenue').textContent = `RM ${totalRev.toFixed(2)}`;
+
+            initAdminCharts();
+
+            const head = document.getElementById('adminTableHead');
+            const body = document.getElementById('adminTableBody');
+            const title = document.getElementById('adminSectionTitle');
+
+            if (currentAdminTab === 'customers') {
+                title.textContent = 'Registered Customer Accounts';
+                head.innerHTML = `<tr><th>User ID</th><th>Customer Name</th><th>Email</th><th>Phone</th><th>Action</th></tr>`;
+                body.innerHTML = db.users.filter(u => u.role === 'customer').map(c => `
+                    <tr>
+                        <td class="fw-bold">#CST-${c.id}</td>
+                        <td>${c.name}</td>
+                        <td>${c.email}</td>
+                        <td>${c.phone}</td>
+                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('users', ${c.id})"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            } else if (currentAdminTab === 'vehicles') {
+                title.textContent = 'Fleet Vehicle Registry';
+                head.innerHTML = `<tr><th>Plate</th><th>Model</th><th>Mileage</th><th>AI Health Score</th><th>Owner Email</th><th>Action</th></tr>`;
+                body.innerHTML = db.vehicles.map(v => `
+                    <tr>
+                        <td class="fw-bold">${v.plate}</td>
+                        <td>${v.brandModel}</td>
+                        <td>${v.mileage.toLocaleString()} km</td>
+                        <td><span class="badge ${v.healthScore > 80 ? 'bg-success' : 'bg-warning text-dark'}">${v.healthScore}%</span></td>
+                        <td>${v.ownerEmail}</td>
+                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('vehicles', ${v.id})"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            } else if (currentAdminTab === 'mechanics') {
+                title.textContent = 'Mechanic Staff Roster';
+                head.innerHTML = `<tr><th>ID</th><th>Mechanic Name</th><th>Email</th><th>Specialty</th><th>Action</th></tr>`;
+                body.innerHTML = db.users.filter(u => u.role === 'mechanic').map(m => `
+                    <tr>
+                        <td class="fw-bold">#MCH-${m.id}</td>
+                        <td>${m.name}</td>
+                        <td>${m.email}</td>
+                        <td>${m.specialty || 'General Diagnostics'}</td>
+                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('users', ${m.id})"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            } else if (currentAdminTab === 'appointments') {
+                title.textContent = 'Service Appointments & Assignments';
+                head.innerHTML = `<tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Service</th><th>Assigned Mechanic</th><th>Status</th><th>Action</th></tr>`;
+                body.innerHTML = db.appointments.map(a => `
+                    <tr>
+                        <td class="fw-bold">#APT-${a.id}</td>
+                        <td>${a.customerName}</td>
+                        <td>${a.vehiclePlate}</td>
+                        <td>${a.service}</td>
+                        <td><span class="fw-bold text-primary">${a.mechanicEmail || 'Unassigned'}</span></td>
+                        <td><span class="status-badge ${a.status === 'Completed' ? 'status-completed' : 'status-pending'}">${a.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openAssignMechanicModal(${a.id})"><i class="fa-solid fa-user-plus"></i> Assign</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else if (currentAdminTab === 'parts') {
+                title.textContent = 'Spare Parts Inventory';
+                head.innerHTML = `<tr><th>Item ID</th><th>Part Name</th><th>Stock Qty</th><th>Unit Price</th><th>Action</th></tr>`;
+                body.innerHTML = db.spareParts.map(p => `
+                    <tr>
+                        <td class="fw-bold">#PRT-${p.id}</td>
+                        <td>${p.name}</td>
+                        <td><span class="fw-bold ${p.qty < 10 ? 'text-danger' : 'text-dark'}">${p.qty} units</span></td>
+                        <td>RM ${p.unitPrice.toFixed(2)}</td>
+                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('spareParts', ${p.id})"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function initAdminCharts() {
+            const ctxRev = document.getElementById('adminRevenueChart').getContext('2d');
+            if (revenueChartInstance) revenueChartInstance.destroy();
+            revenueChartInstance = new Chart(ctxRev, {
+                type: 'line',
+                data: {
+                    labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [{ label: 'Revenue (RM)', data: [12400, 15800, 14200, 18900, 21000, 24500], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctxHealth = document.getElementById('adminHealthChart').getContext('2d');
+            if (healthChartInstance) healthChartInstance.destroy();
+            healthChartInstance = new Chart(ctxHealth, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Optimal (>80%)', 'Moderate (60-80%)', 'Critical (<60%)'],
+                    datasets: [{ data: [14, 5, 2], backgroundColor: ['#16a34a', '#d97706', '#dc2626'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function openAssignMechanicModal(aptId) {
+            document.getElementById('assignAptId').value = aptId;
+            const db = getDB();
+            const mechs = db.users.filter(u => u.role === 'mechanic');
+
+            const select = document.getElementById('assignMechanicSelect');
+            select.innerHTML = mechs.map(m => `<option value="${m.email}">${m.name} (${m.email})</option>`).join('');
+
+            const modal = new bootstrap.Modal(document.getElementById('assignMechanicModal'));
+            modal.show();
+        }
+
+        function confirmAssignMechanic() {
+            const aptId = parseInt(document.getElementById('assignAptId').value);
+            const mechEmail = document.getElementById('assignMechanicSelect').value;
+
+            const db = getDB();
+            const apt = db.appointments.find(a => a.id === aptId);
+            if (apt) {
+                apt.mechanicEmail = mechEmail;
+                apt.status = 'In Progress';
+                saveDB(db);
+                renderAdminDashboard();
+                showToast('Mechanic assigned successfully!');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('assignMechanicModal')).hide();
+        }
+
+        function deleteAdminRecord(collection, id) {
+            const db = getDB();
+            db[collection] = db[collection].filter(item => item.id !== id);
+            saveDB(db);
+            renderAdminDashboard();
+            showToast('Record removed.');
+        }
+
+        // ==========================================
+        // MECHANIC WORKBENCH LOGIC
+        // ==========================================
+        function renderMechanicDashboard() {
+            const db = getDB();
+            const myTasks = db.appointments.filter(a => a.mechanicEmail.toLowerCase() === currentUser.email.toLowerCase());
+
+            document.getElementById('mechAssignedCount').textContent = myTasks.length;
+            document.getElementById('mechInProgressCount').textContent = myTasks.filter(a => a.status === 'In Progress').length;
+            document.getElementById('mechCompletedCount').textContent = db.serviceRecords.length;
+
+            const tbody = document.getElementById('mechanicTasksTableBody');
+            if (myTasks.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No active work orders assigned to your account.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = myTasks.map(t => `
+                <tr>
+                    <td class="fw-bold">#WO-${t.id}</td>
+                    <td>${t.vehiclePlate}</td>
+                    <td>${t.service}</td>
+                    <td>${t.customerName}</td>
+                    <td><span class="status-badge ${t.status === 'Completed' ? 'status-completed' : 'status-in-progress'}">${t.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary rounded-3" onclick="openMechanicUpdateModal(${t.id})"><i class="fa-solid fa-wrench me-1"></i> Update Progress</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openMechanicUpdateModal(taskId) {
+            document.getElementById('mechTaskId').value = taskId;
+            const db = getDB();
+            const partSelect = document.getElementById('mechPartSelect');
+            partSelect.innerHTML = db.spareParts.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.qty}) - RM ${p.unitPrice}</option>`).join('');
+
+            const modal = new bootstrap.Modal(document.getElementById('mechanicModal'));
+            modal.show();
+        }
+
+        function saveMechanicUpdate() {
+            const taskId = parseInt(document.getElementById('mechTaskId').value);
+            const status = document.getElementById('mechStatusSelect').value;
+            const notes = document.getElementById('mechNotes').value;
+            const partId = parseInt(document.getElementById('mechPartSelect').value);
+
+            const db = getDB();
+            const apt = db.appointments.find(a => a.id === taskId);
+            const part = db.spareParts.find(p => p.id === partId);
+
+            if (apt) {
+                apt.status = status;
+                
+                if (status === 'Completed') {
+                    if (part && part.qty > 0) part.qty -= 1;
+
+                    db.serviceRecords.unshift({
+                        id: Date.now(),
+                        date: new Date().toISOString().split('T')[0],
+                        vehiclePlate: apt.vehiclePlate,
+                        service: apt.service,
+                        mileage: 65000,
+                        notes: notes || 'Service completed.',
+                        cost: part ? part.unitPrice + 120 : 250,
+                        status: 'Completed'
+                    });
+
+                    const veh = db.vehicles.find(v => v.plate === apt.vehiclePlate);
+                    if (veh) veh.healthScore = Math.min(100, veh.healthScore + 15);
+                }
+
+                saveDB(db);
+                renderMechanicDashboard();
+                showToast('Work order updated successfully!');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('mechanicModal')).hide();
+        }
+
+        // ==========================================
+        // CUSTOMER PORTAL LOGIC
+        // ==========================================
+        function renderCustomerDashboard() {
+            const db = getDB();
+            const myVehicles = db.vehicles.filter(v => v.ownerEmail.toLowerCase() === currentUser.email.toLowerCase());
+
+            const select = document.getElementById('customerVehicleSelect');
+            if (myVehicles.length === 0) {
+                select.innerHTML = `<option value="">No Registered Vehicles</option>`;
+                document.getElementById('healthScoreValue').textContent = 'N/A';
+                document.getElementById('qrVinDisplay').textContent = 'VIN: NONE';
+                return;
+            }
+
+            select.innerHTML = myVehicles.map(v => `<option value="${v.plate}" ${v.plate === selectedCustomerPlate ? 'selected' : ''}>${v.brandModel} (${v.plate})</option>`).join('');
+
+            if (!selectedCustomerPlate || !myVehicles.some(v => v.plate === selectedCustomerPlate)) {
+                selectedCustomerPlate = myVehicles[0].plate;
+            }
+
+            const activeVeh = myVehicles.find(v => v.plate === selectedCustomerPlate);
+            
+            initHealthGauge(activeVeh.healthScore);
+            renderComponentBreakdown(activeVeh.healthScore);
+            updateQrCode(activeVeh.vin);
+            document.getElementById('qrVinDisplay').textContent = `VIN: ${activeVeh.vin}`;
+            document.getElementById('customerReminderText').textContent = `Vehicle Mileage: ${activeVeh.mileage.toLocaleString()} km. Next AI predicted service due in 1,200 km.`;
+
+            const history = db.serviceRecords.filter(r => r.vehiclePlate === activeVeh.plate);
+            const tbody = document.getElementById('customerServiceTableBody');
+            tbody.innerHTML = history.map(h => `
+                <tr>
+                    <td>${h.date}</td>
+                    <td class="fw-bold">${h.service}</td>
+                    <td>${h.mileage.toLocaleString()} km</td>
+                    <td class="small text-muted">${h.notes}</td>
+                    <td class="fw-bold text-success">RM ${h.cost.toFixed(2)}</td>
+                    <td><span class="badge bg-success-subtle text-success">${h.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function switchCustomerVehicle(plate) {
+            selectedCustomerPlate = plate;
+            renderCustomerDashboard();
+        }
+
+        function initHealthGauge(score) {
+            const ctx = document.getElementById('healthScoreGauge').getContext('2d');
+            if (gaugeChartInstance) gaugeChartInstance.destroy();
+
+            gaugeChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [score, 100 - score],
+                        backgroundColor: [score > 80 ? '#16a34a' : score > 60 ? '#d97706' : '#dc2626', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            document.getElementById('healthScoreValue').textContent = `${score}%`;
+            document.getElementById('healthScoreLabel').textContent = score > 80 ? 'OPTIMAL' : 'SERVICE DUE';
+        }
+
+        function renderComponentBreakdown(score) {
+            const container = document.getElementById('componentBreakdownContainer');
+            const items = [
+                { name: 'Engine Health', val: score },
+                { name: 'Brake Wear', val: Math.max(40, score - 10) },
+                { name: 'Transmission', val: Math.min(95, score + 5) },
+                { name: 'Battery Health', val: 92 }
+            ];
+
+            container.innerHTML = items.map(i => `
+                <div class="col-12 col-sm-6">
+                    <div class="p-3 border rounded-3 bg-white">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold small">${i.name}</span>
+                            <span class="fw-bold small ${i.val > 75 ? 'text-success' : 'text-warning'}">${i.val}%</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar ${i.val > 75 ? 'bg-success' : 'bg-warning'}" style="width: ${i.val}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateQrCode(vin) {
+            const container = document.getElementById("qrcode");
+            container.innerHTML = "";
+            qrcodeInstance = new QRCode(container, {
+                text: `https://uptm-auto.edu.my/passport?vin=${vin}`,
+                width: 110,
+                height: 110
+            });
+        }
+
+        function calculateEstimate() {
+            const val = document.getElementById('costEstimatorSelect').value;
+            document.getElementById('estimatedCostDisplay').textContent = `RM ${parseFloat(val).toFixed(2)}`;
+        }
+
+        function openAddVehicleModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addVehicleModal'));
+            modal.show();
+        }
+
+        function submitAddVehicle(e) {
+            e.preventDefault();
+            const plate = document.getElementById('vehPlate').value.trim();
+            const brandModel = document.getElementById('vehBrandModel').value.trim();
+            const mileage = parseInt(document.getElementById('vehMileage').value);
+            const vin = document.getElementById('vehVin').value.trim();
+
+            const db = getDB();
+            db.vehicles.push({
+                id: Date.now(),
+                plate,
+                brandModel,
+                year: 2023,
+                mileage,
+                vin,
+                ownerEmail: currentUser.email,
+                healthScore: 92
+            });
+
+            saveDB(db);
+            selectedCustomerPlate = plate;
+            bootstrap.Modal.getInstance(document.getElementById('addVehicleModal')).hide();
+            renderCustomerDashboard();
+            showToast('Vehicle registered to your garage!');
+        }
+
+        function openBookAppointmentModal() {
+            const modal = new bootstrap.Modal(document.getElementById('customerBookModal'));
+            modal.show();
+        }
+
+        function submitCustomerBooking() {
+            const date = document.getElementById('bookDate').value;
+            const service = document.getElementById('bookServiceType').value;
+
+            if (!date) { alert('Please pick a preferred date'); return; }
+
+            const db = getDB();
+            db.appointments.push({
+                id: Date.now(),
+                customerEmail: currentUser.email,
+                customerName: currentUser.name,
+                vehiclePlate: selectedCustomerPlate,
+                service,
+                date,
+                status: 'Pending',
+                mechanicEmail: ''
+            });
+
+            saveDB(db);
+            bootstrap.Modal.getInstance(document.getElementById('customerBookModal')).hide();
+            showToast('Appointment booked successfully!');
+        }
+
+        // ==========================================
+        // PROFILE MODAL SETTINGS
+        // ==========================================
+        function openProfileModal() {
+            document.getElementById('profileName').value = currentUser.name;
+            document.getElementById('profileEmail').value = currentUser.email;
+            document.getElementById('profilePhone').value = currentUser.phone || '';
+            document.getElementById('profileRole').value = currentUser.role.toUpperCase();
+
+            const branchContainer = document.getElementById('profileBranchContainer');
+            if (currentUser.role === 'admin') {
+                branchContainer.classList.remove('d-none');
+                document.getElementById('profileBranch').value = currentUser.branch || '';
+            } else {
+                branchContainer.classList.add('d-none');
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+            modal.show();
+        }
+
+        function saveProfileSettings(e) {
+            e.preventDefault();
+            const newName = document.getElementById('profileName').value;
+            const newPhone = document.getElementById('profilePhone').value;
+
+            const db = getDB();
+            const u = db.users.find(x => x.email === currentUser.email);
+            if (u) {
+                u.name = newName;
+                u.phone = newPhone;
+                if (currentUser.role === 'admin') {
+                    u.branch = document.getElementById('profileBranch').value;
+                    currentUser.branch = u.branch;
+                }
+                saveDB(db);
+
+                currentUser.name = newName;
+                currentUser.phone = newPhone;
+                localStorage.setItem('uptm_smartauto_session', JSON.stringify(currentUser));
+
+                showAppDashboard();
+                showToast('Profile settings saved successfully!');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('profileModal')).hide();
+        }
+
+        // Notification Helper
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = 'toast align-items-center text-white bg-dark border-0 show mb-2';
+            el.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body"><i class="fa-solid fa-circle-check text-success me-2"></i>${msg}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
