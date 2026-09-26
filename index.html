@@ -153,45 +153,45 @@
                 </div>
             </div>
 
-            <!-- REGISTRATION FORM -->
-            <div id="registerFormContainer" class="d-none">
-                <form onsubmit="handleRegistration(event)">
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold">Full Name</label>
-                        <input type="text" class="form-control bg-light" id="regName" required>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold">Email Address</label>
-                        <input type="email" class="form-control bg-light" id="regEmail" required>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold">Phone Number</label>
-                        <input type="text" class="form-control bg-light" id="regPhone" required>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold">Role Type</label>
-                        <select class="form-select bg-light" id="regRole" onchange="toggleRoleFields(this.value)" required>
-                            <option value="customer">Vehicle Owner (Customer)</option>
-                            <option value="mechanic">Workshop Technician</option>
-                            <option value="admin">Workshop Administrator</option>
-                        </select>
-                    </div>
+           <!-- REGISTRATION FORM -->
+<div id="registerFormContainer" class="d-none">
+    <form id="registrationForm" onsubmit="handleRegistration(event)">
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Full Name</label>
+            <input type="text" class="form-control bg-light" id="regName" required>
+        </div>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Email Address</label>
+            <input type="email" class="form-control bg-light" id="regEmail" required>
+        </div>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Phone Number</label>
+            <input type="tel" class="form-control bg-light" id="regPhone" required>
+        </div>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Role Type</label>
+            <select class="form-select bg-light" id="regRole" onchange="toggleRoleFields(this.value)" required>
+                <option value="customer" selected>Vehicle Owner (Customer)</option>
+                <option value="mechanic">Workshop Technician</option>
+                <option value="admin">Workshop Administrator</option>
+            </select>
+        </div>
 
-                    <div id="adminRegFields" class="p-3 bg-danger-subtle rounded-3 mb-2 d-none border border-danger-subtle">
-                        <label class="form-label small fw-bold text-danger">Admin Key</label>
-                        <input type="password" class="form-control bg-white" id="regAdminKey" placeholder="Use: UPTM2026">
-                    </div>
+        <div id="adminRegFields" class="p-3 bg-danger-subtle rounded-3 mb-2 d-none border border-danger-subtle">
+            <label class="form-label small fw-bold text-danger">Admin Key</label>
+            <input type="password" class="form-control bg-white" id="regAdminKey" placeholder="Use: UPTM2026">
+        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Password</label>
-                        <input type="password" class="form-control bg-light" id="regPassword" required>
-                    </div>
-                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3 mb-3">Register Account</button>
-                </form>
-                <div class="text-center">
-                    <a href="#" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('login')">Back to Login</a>
-                </div>
-            </div>
+        <div class="mb-3">
+            <label class="form-label small fw-bold">Password</label>
+            <input type="password" class="form-control bg-light" id="regPassword" required>
+        </div>
+        <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3 mb-3">Register Account</button>
+    </form>
+    <div class="text-center">
+        <a href="#" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('login')">Back to Login</a>
+    </div>
+</div>
         </div>
     </div>
 
@@ -503,41 +503,39 @@
 
     // FIXED REGISTRATION FUNCTION
     async function handleRegistration(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('regName').value.trim();
-        const email = document.getElementById('regEmail').value.trim().toLowerCase();
-        const phone = document.getElementById('regPhone').value.trim();
-        const role = document.getElementById('regRole').value;
-        const adminKey = document.getElementById('regAdminKey') ? document.getElementById('regAdminKey').value.trim() : '';
+    if (e) e.preventDefault();
 
-        // Validate Admin Key if Admin is selected
-        if (role === 'admin' && adminKey !== 'UPTM2026') {
-            alert('Invalid Admin Key! Please enter the correct key (UPTM2026).');
-            return;
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim().toLowerCase();
+    const phone = document.getElementById('regPhone').value.trim();
+    const role = document.getElementById('regRole').value;
+    const adminKeyInput = document.getElementById('regAdminKey');
+    const adminKey = adminKeyInput ? adminKeyInput.value.trim() : '';
+
+    if (role === 'admin' && adminKey !== 'UPTM2026') {
+        alert('Invalid Admin Key! Use UPTM2026.');
+        return;
+    }
+
+    const newUser = { id: Date.now(), name, email, phone, role };
+
+    // Save session immediately so user can enter the portal
+    currentUser = newUser;
+    localStorage.setItem('uptm_smartauto_session', JSON.stringify(newUser));
+
+    // Async push to Firebase
+    try {
+        if (window.db && window.dbPush && window.dbRef) {
+            const newUserRef = window.dbPush(window.dbRef(window.db, 'users'));
+            await window.dbSet(newUserRef, newUser);
         }
+    } catch (err) {
+        console.warn('Database offline, logged in locally:', err);
+    }
 
-        const newUser = { id: Date.now(), name, email, phone, role };
-
-        try {
-            // Save to LocalStorage immediately as a fallback
-            currentUser = newUser;
-            localStorage.setItem('uptm_smartauto_session', JSON.stringify(newUser));
-
-            // Push to Firebase Realtime Database
-            if (window.db && window.dbPush && window.dbRef) {
-                const newUserRef = window.dbPush(window.dbRef(window.db, 'users'));
-                await window.dbSet(newUserRef, newUser);
-            }
-
-            showAppDashboard();
-            showToast('Account registered and synced successfully!');
-        } catch (error) {
-            console.error("Firebase Sync Error:", error);
-            // Fallback: Proceed even if database network fails locally
-            showAppDashboard();
-            showToast('Registered in Offline/Local Mode!');
-        }
+    showAppDashboard();
+    showToast('Account registered successfully!');
+}
     }
 
     function handleLogout() {
