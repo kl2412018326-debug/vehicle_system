@@ -8,10 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- QRCode.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -86,20 +82,6 @@
             background: #ffffff;
         }
 
-        .health-gauge-container {
-            position: relative;
-            width: 180px;
-            height: 180px;
-            margin: 0 auto;
-        }
-
-        .health-score-val {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
         .status-badge {
             padding: 0.4em 0.8em;
             border-radius: 6px;
@@ -126,7 +108,7 @@
 
             <!-- LOGIN FORM -->
             <div id="loginFormContainer">
-                <form onsubmit="handleLogin(event)">
+                <form id="loginForm" onsubmit="handleLogin(event)">
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Email Address</label>
                         <input type="email" class="form-control bg-light" id="loginEmail" required placeholder="name@domain.com">
@@ -140,58 +122,58 @@
 
                 <div class="text-center">
                     <span class="small text-muted">Need a new account? </span>
-                    <a href="#" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('register')">Register Now</a>
+                    <a href="javascript:void(0)" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('register')">Register Now</a>
                 </div>
 
                 <div class="mt-4 pt-3 border-top text-center">
                     <small class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 0.7rem;">Quick Demo Accounts</small>
                     <div class="d-flex flex-wrap gap-1 justify-content-center">
-                        <button class="btn btn-outline-danger btn-sm" onclick="quickLogin('admin@uptm.edu.my')">Admin</button>
-                        <button class="btn btn-outline-warning btn-sm" onclick="quickLogin('mechanic@uptm.edu.my')">Mechanic</button>
-                        <button class="btn btn-outline-primary btn-sm" onclick="quickLogin('customer@uptm.edu.my')">Customer</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="quickLogin('admin@uptm.edu.my')">Admin</button>
+                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="quickLogin('mechanic@uptm.edu.my')">Mechanic</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickLogin('customer@uptm.edu.my')">Customer</button>
                     </div>
                 </div>
             </div>
 
-           <!-- REGISTRATION FORM -->
-<div id="registerFormContainer" class="d-none">
-    <form id="registrationForm" onsubmit="handleRegistration(event)">
-        <div class="mb-2">
-            <label class="form-label small fw-bold">Full Name</label>
-            <input type="text" class="form-control bg-light" id="regName" required>
-        </div>
-        <div class="mb-2">
-            <label class="form-label small fw-bold">Email Address</label>
-            <input type="email" class="form-control bg-light" id="regEmail" required>
-        </div>
-        <div class="mb-2">
-            <label class="form-label small fw-bold">Phone Number</label>
-            <input type="tel" class="form-control bg-light" id="regPhone" required>
-        </div>
-        <div class="mb-2">
-            <label class="form-label small fw-bold">Role Type</label>
-            <select class="form-select bg-light" id="regRole" onchange="toggleRoleFields(this.value)" required>
-                <option value="customer" selected>Vehicle Owner (Customer)</option>
-                <option value="mechanic">Workshop Technician</option>
-                <option value="admin">Workshop Administrator</option>
-            </select>
-        </div>
+            <!-- REGISTRATION FORM -->
+            <div id="registerFormContainer" class="d-none">
+                <form id="registerForm" onsubmit="handleRegistration(event)">
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Full Name</label>
+                        <input type="text" class="form-control bg-light" id="regName" required placeholder="Your Full Name">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Email Address</label>
+                        <input type="email" class="form-control bg-light" id="regEmail" required placeholder="name@domain.com">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Phone Number</label>
+                        <input type="text" class="form-control bg-light" id="regPhone" required placeholder="0123456789">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Role Type</label>
+                        <select class="form-select bg-light" id="regRole" onchange="toggleRoleFields(this.value)" required>
+                            <option value="customer" selected>Vehicle Owner (Customer)</option>
+                            <option value="mechanic">Workshop Technician</option>
+                            <option value="admin">Workshop Administrator</option>
+                        </select>
+                    </div>
 
-        <div id="adminRegFields" class="p-3 bg-danger-subtle rounded-3 mb-2 d-none border border-danger-subtle">
-            <label class="form-label small fw-bold text-danger">Admin Key</label>
-            <input type="password" class="form-control bg-white" id="regAdminKey" placeholder="Use: UPTM2026">
-        </div>
+                    <div id="adminRegFields" class="p-3 bg-danger-subtle rounded-3 mb-2 d-none border border-danger-subtle">
+                        <label class="form-label small fw-bold text-danger">Admin Key</label>
+                        <input type="password" class="form-control bg-white" id="regAdminKey" placeholder="Use: UPTM2026">
+                    </div>
 
-        <div class="mb-3">
-            <label class="form-label small fw-bold">Password</label>
-            <input type="password" class="form-control bg-light" id="regPassword" required>
-        </div>
-        <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3 mb-3">Register Account</button>
-    </form>
-    <div class="text-center">
-        <a href="#" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('login')">Back to Login</a>
-    </div>
-</div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Password</label>
+                        <input type="password" class="form-control bg-light" id="regPassword" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3 mb-3">Register Account</button>
+                </form>
+                <div class="text-center">
+                    <a href="javascript:void(0)" class="small fw-bold text-primary text-decoration-none" onclick="toggleAuthMode('login')">Back to Login</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -228,7 +210,7 @@
                 <div id="adminView" class="role-view d-none">
                     <div class="p-3 bg-primary text-white rounded-3 mb-4 d-flex justify-content-between align-items-center shadow-sm">
                         <h5 class="fw-bold mb-0"><i class="fa-solid fa-warehouse me-2"></i>Central Workshop Live Control Panel</h5>
-                        <span class="badge bg-white text-primary fw-bold" id="adminAccountBadge">Admin Panel</span>
+                        <span class="badge bg-white text-primary fw-bold">Admin Panel</span>
                     </div>
 
                     <div class="row g-3 mb-4">
@@ -247,10 +229,7 @@
                     </div>
 
                     <div class="stat-card p-3 p-md-4 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold mb-0" id="adminSectionTitle">Live System Data</h5>
-                            <div id="adminActionBtnContainer"></div>
-                        </div>
+                        <h5 class="fw-bold mb-3">Live System Data</h5>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-light"><tr id="adminTableHead"></tr></thead>
@@ -263,7 +242,7 @@
                 <!-- MECHANIC VIEW -->
                 <div id="mechanicView" class="role-view d-none">
                     <div class="stat-card p-3 p-md-4">
-                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i>Assigned Customer Work Orders (Live Sync)</h5>
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i>Assigned Customer Work Orders</h5>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
@@ -287,11 +266,11 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 bg-white stat-card">
                         <div>
                             <small class="text-muted d-block fw-bold">ACTIVE VEHICLE</small>
-                            <select class="form-select border-0 bg-transparent fw-bold fs-5 p-0 pe-4" id="customerVehicleSelect" onchange="switchCustomerVehicle(this.value)">
+                            <select class="form-select border-0 bg-transparent fw-bold fs-5 p-0 pe-4" id="customerVehicleSelect">
                             </select>
                         </div>
                         <button class="btn btn-outline-primary btn-sm rounded-3" onclick="openAddVehicleModal()">
-                            <i class="fa-solid fa-circle-plus me-1"></i> Register New Vehicle (Sync across devices)
+                            <i class="fa-solid fa-circle-plus me-1"></i> Register New Vehicle
                         </button>
                     </div>
 
@@ -345,7 +324,7 @@
                             <label class="form-label small fw-bold">VIN / Chassis Number</label>
                             <input type="text" class="form-control" id="vehVin" required placeholder="e.g. WBA12345678">
                         </div>
-                        <button type="submit" class="btn btn-success w-100 rounded-3">Save & Sync Vehicle Data</button>
+                        <button type="submit" class="btn btn-success w-100 rounded-3">Save Vehicle Data</button>
                     </form>
                 </div>
             </div>
@@ -374,7 +353,7 @@
                                 <option value="Major Engine Service">Major Engine Service (RM 850)</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 rounded-3">Submit Booking to Admin</button>
+                        <button type="submit" class="btn btn-primary w-100 rounded-3">Submit Booking</button>
                     </form>
                 </div>
             </div>
@@ -403,354 +382,380 @@
         </div>
     </div>
 
-<!-- FIREBASE SDKs (Modular Script Setup) -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    <!-- Firebase Compat Library for 100% Reliable Cross-Browser Sync -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    // Firebase Public/Demo Database Setup
-    const firebaseConfig = {
-        databaseURL: "https://uptm-smartauto-default-rtdb.asia-southeast1.firebasedatabase.app"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // Attach to Global Scope for non-module scripts
-    window.db = db;
-    window.dbRef = ref;
-    window.dbSet = set;
-    window.dbPush = push;
-    window.dbGet = get;
-
-    // Realtime Listeners
-    onValue(ref(db, 'vehicles'), (snapshot) => {
-        window.liveVehicles = snapshot.val() ? Object.values(snapshot.val()) : [];
-        if (window.refreshCurrentDashboard) window.refreshCurrentDashboard();
-    });
-
-    onValue(ref(db, 'appointments'), (snapshot) => {
-        window.liveAppointments = snapshot.val() ? Object.values(snapshot.val()) : [];
-        if (window.refreshCurrentDashboard) window.refreshCurrentDashboard();
-    });
-
-    onValue(ref(db, 'users'), (snapshot) => {
-        window.liveUsers = snapshot.val() ? Object.values(snapshot.val()) : [];
-        if (window.refreshCurrentDashboard) window.refreshCurrentDashboard();
-    });
-</script>
-
-<script>
-    let currentUser = null;
-    let currentAdminTab = 'vehicles';
-
-    window.liveVehicles = [];
-    window.liveAppointments = [];
-    window.liveUsers = [];
-
-    window.onload = function() {
-        const session = localStorage.getItem('uptm_smartauto_session');
-        if (session) {
-            currentUser = JSON.parse(session);
-            showAppDashboard();
-        }
-    };
-
-    function refreshCurrentDashboard() {
-        if (!currentUser) return;
-        if (currentUser.role === 'admin') renderAdminDashboard();
-        else if (currentUser.role === 'mechanic') renderMechanicDashboard();
-        else if (currentUser.role === 'customer') renderCustomerDashboard();
-    }
-
-    function toggleAuthMode(mode) {
-        document.getElementById('loginFormContainer').classList.toggle('d-none', mode === 'register');
-        document.getElementById('registerFormContainer').classList.toggle('d-none', mode === 'login');
-    }
-
-    function toggleRoleFields(role) {
-        document.getElementById('adminRegFields').classList.toggle('d-none', role !== 'admin');
-    }
-
-    function quickLogin(email) {
-        document.getElementById('loginEmail').value = email;
-        document.getElementById('loginPassword').value = 'pass';
-        handleLogin(new Event('submit'));
-    }
-
-    async function handleLogin(e) {
-        if (e) e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-        
-        let users = window.liveUsers;
-        let found = users.find(u => u.email && u.email.toLowerCase() === email);
-
-        if (!found) {
-            if (email === 'admin@uptm.edu.my') found = { name: 'Main Admin', email, role: 'admin' };
-            else if (email === 'mechanic@uptm.edu.my') found = { name: 'Encik Kamal (Mechanic)', email, role: 'mechanic' };
-            else if (email === 'customer@uptm.edu.my') found = { name: 'Muhammad Aqil', email, role: 'customer' };
-        }
-
-        if (found) {
-            currentUser = found;
-            localStorage.setItem('uptm_smartauto_session', JSON.stringify(found));
-            showAppDashboard();
-            showToast(`Signed in as ${currentUser.name}`);
-        } else {
-            alert('Account not found. Please register first!');
-        }
-    }
-
-    // FIXED REGISTRATION FUNCTION
-    async function handleRegistration(e) {
-    if (e) e.preventDefault();
-
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim().toLowerCase();
-    const phone = document.getElementById('regPhone').value.trim();
-    const role = document.getElementById('regRole').value;
-    const adminKeyInput = document.getElementById('regAdminKey');
-    const adminKey = adminKeyInput ? adminKeyInput.value.trim() : '';
-
-    if (role === 'admin' && adminKey !== 'UPTM2026') {
-        alert('Invalid Admin Key! Use UPTM2026.');
-        return;
-    }
-
-    const newUser = { id: Date.now(), name, email, phone, role };
-
-    // Save session immediately so user can enter the portal
-    currentUser = newUser;
-    localStorage.setItem('uptm_smartauto_session', JSON.stringify(newUser));
-
-    // Async push to Firebase
-    try {
-        if (window.db && window.dbPush && window.dbRef) {
-            const newUserRef = window.dbPush(window.dbRef(window.db, 'users'));
-            await window.dbSet(newUserRef, newUser);
-        }
-    } catch (err) {
-        console.warn('Database offline, logged in locally:', err);
-    }
-
-    showAppDashboard();
-    showToast('Account registered successfully!');
-}
-    }
-
-    function handleLogout() {
-        localStorage.removeItem('uptm_smartauto_session');
-        currentUser = null;
-        document.getElementById('appContainer').classList.add('d-none');
-        document.getElementById('authScreen').classList.remove('d-none');
-    }
-
-    function showAppDashboard() {
-        document.getElementById('authScreen').classList.add('d-none');
-        document.getElementById('appContainer').classList.remove('d-none');
-
-        document.getElementById('navUserName').textContent = currentUser.name;
-        document.getElementById('navUserRoleBadge').textContent = currentUser.role.toUpperCase();
-        document.getElementById('navAvatarCircle').textContent = currentUser.name.charAt(0).toUpperCase();
-
-        document.querySelectorAll('.role-view').forEach(el => el.classList.add('d-none'));
-        renderSidebar();
-
-        if (currentUser.role === 'admin') {
-            document.getElementById('adminView').classList.remove('d-none');
-        } else if (currentUser.role === 'mechanic') {
-            document.getElementById('mechanicView').classList.remove('d-none');
-        } else if (currentUser.role === 'customer') {
-            document.getElementById('customerView').classList.remove('d-none');
-        }
-        refreshCurrentDashboard();
-    }
-
-    function renderSidebar() {
-        const sidebar = document.getElementById('sidebarMenu');
-        if (currentUser.role === 'admin') {
-            sidebar.innerHTML = `
-                <div class="px-3 mb-2 text-uppercase fw-bold text-muted small">Admin Dashboard</div>
-                <a class="nav-link-custom ${currentAdminTab === 'vehicles' ? 'active' : ''}" href="#" onclick="setAdminTab('vehicles')"><i class="fa-solid fa-car"></i> Live Registered Cars</a>
-                <a class="nav-link-custom ${currentAdminTab === 'appointments' ? 'active' : ''}" href="#" onclick="setAdminTab('appointments')"><i class="fa-solid fa-calendar-alt"></i> Live Service Requests</a>
-            `;
-        } else if (currentUser.role === 'mechanic') {
-            sidebar.innerHTML = `<a class="nav-link-custom active" href="#"><i class="fa-solid fa-wrench"></i> Mechanic Duty Console</a>`;
-        } else {
-            sidebar.innerHTML = `<a class="nav-link-custom active" href="#"><i class="fa-solid fa-gauge-high"></i> Customer Portal</a>`;
-        }
-    }
-
-    function setAdminTab(tab) {
-        currentAdminTab = tab;
-        renderSidebar();
-        renderAdminDashboard();
-    }
-
-    function renderAdminDashboard() {
-        document.getElementById('adminTotalVehicles').textContent = window.liveVehicles.length;
-        document.getElementById('adminPendingApps').textContent = window.liveAppointments.filter(a => a.status !== 'Completed').length;
-
-        const head = document.getElementById('adminTableHead');
-        const body = document.getElementById('adminTableBody');
-
-        if (currentAdminTab === 'vehicles') {
-            head.innerHTML = `<tr><th>Plate Number</th><th>Car Model</th><th>Mileage</th><th>Chassis / VIN</th><th>Owner Email</th></tr>`;
-            body.innerHTML = window.liveVehicles.map(v => `
-                <tr>
-                    <td class="fw-bold text-primary">${v.plate}</td>
-                    <td>${v.brandModel}</td>
-                    <td>${v.mileage} km</td>
-                    <td><code>${v.vin}</code></td>
-                    <td>${v.ownerEmail}</td>
-                </tr>
-            `).join('') || `<tr><td colspan="5" class="text-center py-3 text-muted">No vehicle data submitted yet.</td></tr>`;
-        } else {
-            head.innerHTML = `<tr><th>ID</th><th>Customer Name</th><th>Vehicle</th><th>Service</th><th>Status</th><th>Mechanic Assigned</th><th>Action</th></tr>`;
-            body.innerHTML = window.liveAppointments.map(a => `
-                <tr>
-                    <td>#WO-${a.id}</td>
-                    <td>${a.customerName}</td>
-                    <td>${a.vehiclePlate}</td>
-                    <td>${a.service}</td>
-                    <td><span class="status-badge ${a.status === 'In Progress' ? 'status-in-progress' : 'status-pending'}">${a.status}</span></td>
-                    <td class="fw-bold text-success">${a.mechanicEmail || 'Unassigned'}</td>
-                    <td><button class="btn btn-sm btn-outline-primary" onclick="openAssignMechanicModal('${a.id}')">Assign Mechanic</button></td>
-                </tr>
-            `).join('') || `<tr><td colspan="7" class="text-center py-3 text-muted">No appointments submitted yet.</td></tr>`;
-        }
-    }
-
-    function renderMechanicDashboard() {
-        const tbody = document.getElementById('mechanicTasksTableBody');
-        const myTasks = window.liveAppointments.filter(a => a.mechanicEmail && a.mechanicEmail.toLowerCase() === currentUser.email.toLowerCase());
-
-        tbody.innerHTML = myTasks.map(t => `
-            <tr>
-                <td class="fw-bold">#WO-${t.id}</td>
-                <td class="fw-bold text-primary">${t.vehiclePlate}</td>
-                <td>${t.service}</td>
-                <td>${t.customerName}</td>
-                <td><span class="status-badge ${t.status === 'Completed' ? 'status-completed' : 'status-in-progress'}">${t.status}</span></td>
-                <td><button class="btn btn-sm btn-success" onclick="completeJob('${t.id}')">Mark Complete</button></td>
-            </tr>
-        `).join('') || `<tr><td colspan="6" class="text-center py-4 text-muted">No assigned jobs found.</td></tr>`;
-    }
-
-    function renderCustomerDashboard() {
-        const myVehicles = window.liveVehicles.filter(v => v.ownerEmail && v.ownerEmail.toLowerCase() === currentUser.email.toLowerCase());
-        const select = document.getElementById('customerVehicleSelect');
-
-        if (myVehicles.length === 0) {
-            select.innerHTML = `<option>No Registered Vehicles Found</option>`;
-        } else {
-            select.innerHTML = myVehicles.map(v => `<option value="${v.plate}">${v.brandModel} (${v.plate})</option>`).join('');
-        }
-
-        const myApps = window.liveAppointments.filter(a => a.customerEmail && a.customerEmail.toLowerCase() === currentUser.email.toLowerCase());
-        document.getElementById('customerAppTableBody').innerHTML = myApps.map(a => `
-            <tr>
-                <td>${a.date}</td>
-                <td>${a.service}</td>
-                <td><span class="status-badge ${a.status === 'In Progress' ? 'status-in-progress' : 'status-pending'}">${a.status}</span></td>
-                <td>${a.mechanicEmail || 'Pending Assignment'}</td>
-            </tr>
-        `).join('') || `<tr><td colspan="4" class="text-center py-3 text-muted">No service bookings made yet.</td></tr>`;
-    }
-
-    function openAddVehicleModal() {
-        new bootstrap.Modal(document.getElementById('addVehicleModal')).show();
-    }
-
-    async function submitAddVehicle(e) {
-        e.preventDefault();
-        const plate = document.getElementById('vehPlate').value.trim();
-        const brandModel = document.getElementById('vehBrandModel').value.trim();
-        const mileage = document.getElementById('vehMileage').value;
-        const vin = document.getElementById('vehVin').value.trim();
-
-        const newCar = { id: Date.now(), plate, brandModel, mileage, vin, ownerEmail: currentUser.email };
-
-        if (window.db && window.dbPush && window.dbRef) {
-            const newCarRef = window.dbPush(window.dbRef(window.db, 'vehicles'));
-            await window.dbSet(newCarRef, newCar);
-        }
-
-        bootstrap.Modal.getInstance(document.getElementById('addVehicleModal')).hide();
-        showToast('Vehicle saved and synced across all devices!');
-    }
-
-    function openBookAppointmentModal() {
-        new bootstrap.Modal(document.getElementById('customerBookModal')).show();
-    }
-
-    async function submitCustomerBooking(e) {
-        e.preventDefault();
-        const date = document.getElementById('bookDate').value;
-        const service = document.getElementById('bookServiceType').value;
-        const plateSelect = document.getElementById('customerVehicleSelect');
-
-        const newApt = {
-            id: Date.now(),
-            customerEmail: currentUser.email,
-            customerName: currentUser.name,
-            vehiclePlate: plateSelect.value || 'N/A',
-            service,
-            date,
-            status: 'Pending',
-            mechanicEmail: ''
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            databaseURL: "https://smartauto-ai-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
 
-        if (window.db && window.dbPush && window.dbRef) {
-            const aptRef = window.dbPush(window.dbRef(window.db, 'appointments'));
-            await window.dbSet(aptRef, newApt);
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch (err) {
+            console.warn("Firebase Init Warning:", err);
         }
 
-        bootstrap.Modal.getInstance(document.getElementById('customerBookModal')).hide();
-        showToast('Appointment booked and sent to Admin!');
-    }
+        let currentUser = null;
+        let currentAdminTab = 'vehicles';
 
-    function openAssignMechanicModal(aptId) {
-        document.getElementById('assignAptId').value = aptId;
-        const select = document.getElementById('assignMechanicSelect');
-        select.innerHTML = `
-            <option value="mechanic@uptm.edu.my">Encik Kamal Rosli (mechanic@uptm.edu.my)</option>
-        `;
-        new bootstrap.Modal(document.getElementById('assignMechanicModal')).show();
-    }
+        window.liveVehicles = [];
+        window.liveAppointments = [];
+        window.liveUsers = [];
 
-    async function confirmAssignMechanic() {
-        const aptId = document.getElementById('assignAptId').value;
-        const mechEmail = document.getElementById('assignMechanicSelect').value;
+        // Realtime sync listeners
+        if (db) {
+            db.ref('vehicles').on('value', (snapshot) => {
+                const val = snapshot.val();
+                window.liveVehicles = val ? Object.values(val) : [];
+                refreshCurrentDashboard();
+            });
 
-        if (window.db && window.dbGet && window.dbRef) {
-            const snapshot = await window.dbGet(window.dbRef(window.db, 'appointments'));
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                for (let key in data) {
-                    if (data[key].id.toString() === aptId.toString()) {
-                        data[key].mechanicEmail = mechEmail;
-                        data[key].status = 'In Progress';
-                        await window.dbSet(window.dbRef(window.db, `appointments/${key}`), data[key]);
-                        break;
-                    }
+            db.ref('appointments').on('value', (snapshot) => {
+                const val = snapshot.val();
+                window.liveAppointments = val ? Object.values(val) : [];
+                refreshCurrentDashboard();
+            });
+
+            db.ref('users').on('value', (snapshot) => {
+                const val = snapshot.val();
+                window.liveUsers = val ? Object.values(val) : [];
+                refreshCurrentDashboard();
+            });
+        }
+
+        window.onload = function() {
+            const session = localStorage.getItem('uptm_smartauto_session');
+            if (session) {
+                currentUser = JSON.parse(session);
+                showAppDashboard();
+            }
+        };
+
+        function refreshCurrentDashboard() {
+            if (!currentUser) return;
+            if (currentUser.role === 'admin') renderAdminDashboard();
+            else if (currentUser.role === 'mechanic') renderMechanicDashboard();
+            else if (currentUser.role === 'customer') renderCustomerDashboard();
+        }
+
+        function toggleAuthMode(mode) {
+            document.getElementById('loginFormContainer').classList.toggle('d-none', mode === 'register');
+            document.getElementById('registerFormContainer').classList.toggle('d-none', mode === 'login');
+        }
+
+        function toggleRoleFields(role) {
+            document.getElementById('adminRegFields').classList.toggle('d-none', role !== 'admin');
+        }
+
+        function quickLogin(email) {
+            document.getElementById('loginEmail').value = email;
+            document.getElementById('loginPassword').value = '123456';
+            handleLogin();
+        }
+
+        function handleLogin(e) {
+            if (e) e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+
+            let users = window.liveUsers || [];
+            let found = users.find(u => u.email && u.email.toLowerCase() === email);
+
+            // Pre-registered system defaults fallback
+            if (!found) {
+                if (email === 'admin@uptm.edu.my') found = { name: 'Main Admin', email, role: 'admin' };
+                else if (email === 'mechanic@uptm.edu.my') found = { name: 'Encik Kamal (Mechanic)', email, role: 'mechanic' };
+                else if (email === 'customer@uptm.edu.my') found = { name: 'Muhammad Aqil', email, role: 'customer' };
+                else {
+                    // Accept login using registered details saved in localStorage if database is loading
+                    const storedUsers = JSON.parse(localStorage.getItem('registered_users_db') || '[]');
+                    found = storedUsers.find(u => u.email && u.email.toLowerCase() === email);
                 }
+            }
+
+            if (found) {
+                currentUser = found;
+                localStorage.setItem('uptm_smartauto_session', JSON.stringify(found));
+                showAppDashboard();
+                showToast(`Welcome back, ${currentUser.name}!`);
+            } else {
+                alert('Account not found! Please fill in your details and click Register Account.');
             }
         }
 
-        bootstrap.Modal.getInstance(document.getElementById('assignMechanicModal')).hide();
-        showToast('Assigned mechanic successfully!');
-    }
+        function handleRegistration(e) {
+            if (e) e.preventDefault();
 
-    function showToast(msg) {
-        const container = document.getElementById('toastContainer');
-        if (!container) return;
-        const el = document.createElement('div');
-        el.className = 'toast align-items-center text-white bg-dark border-0 show mb-2';
-        el.innerHTML = `<div class="d-flex"><div class="toast-body"><i class="fa-solid fa-circle-check text-success me-2"></i>${msg}</div></div>`;
-        container.appendChild(el);
-        setTimeout(() => el.remove(), 3000);
-    }
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('regPhone').value.trim();
+            const role = document.getElementById('regRole').value;
+            const adminKeyInput = document.getElementById('regAdminKey');
+            const adminKey = adminKeyInput ? adminKeyInput.value.trim() : '';
+
+            if (role === 'admin' && adminKey !== 'UPTM2026') {
+                alert('Invalid Admin Key! Please enter: UPTM2026');
+                return;
+            }
+
+            const newUser = { id: Date.now(), name, email, phone, role };
+
+            // Save to Local Data Store
+            let storedUsers = JSON.parse(localStorage.getItem('registered_users_db') || '[]');
+            storedUsers.push(newUser);
+            localStorage.setItem('registered_users_db', JSON.stringify(storedUsers));
+
+            // Sync with Firebase Cloud
+            if (db) {
+                db.ref('users').push(newUser);
+            }
+
+            currentUser = newUser;
+            localStorage.setItem('uptm_smartauto_session', JSON.stringify(newUser));
+
+            showAppDashboard();
+            showToast('Account registered successfully!');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('uptm_smartauto_session');
+            currentUser = null;
+            document.getElementById('appContainer').classList.add('d-none');
+            document.getElementById('authScreen').classList.remove('d-none');
+        }
+
+        function showAppDashboard() {
+            document.getElementById('authScreen').classList.add('d-none');
+            document.getElementById('appContainer').classList.remove('d-none');
+
+            document.getElementById('navUserName').textContent = currentUser.name;
+            document.getElementById('navUserRoleBadge').textContent = currentUser.role.toUpperCase();
+            document.getElementById('navAvatarCircle').textContent = currentUser.name.charAt(0).toUpperCase();
+
+            document.querySelectorAll('.role-view').forEach(el => el.classList.add('d-none'));
+            renderSidebar();
+
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminView').classList.remove('d-none');
+            } else if (currentUser.role === 'mechanic') {
+                document.getElementById('mechanicView').classList.remove('d-none');
+            } else if (currentUser.role === 'customer') {
+                document.getElementById('customerView').classList.remove('d-none');
+            }
+            refreshCurrentDashboard();
+        }
+
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            if (currentUser.role === 'admin') {
+                sidebar.innerHTML = `
+                    <div class="px-3 mb-2 text-uppercase fw-bold text-muted small">Admin Dashboard</div>
+                    <a class="nav-link-custom ${currentAdminTab === 'vehicles' ? 'active' : ''}" href="javascript:void(0)" onclick="setAdminTab('vehicles')"><i class="fa-solid fa-car"></i> Live Registered Cars</a>
+                    <a class="nav-link-custom ${currentAdminTab === 'appointments' ? 'active' : ''}" href="javascript:void(0)" onclick="setAdminTab('appointments')"><i class="fa-solid fa-calendar-alt"></i> Live Service Requests</a>
+                `;
+            } else if (currentUser.role === 'mechanic') {
+                sidebar.innerHTML = `<a class="nav-link-custom active" href="javascript:void(0)"><i class="fa-solid fa-wrench"></i> Mechanic Duty Console</a>`;
+            } else {
+                sidebar.innerHTML = `<a class="nav-link-custom active" href="javascript:void(0)"><i class="fa-solid fa-gauge-high"></i> Customer Portal</a>`;
+            }
+        }
+
+        function setAdminTab(tab) {
+            currentAdminTab = tab;
+            renderSidebar();
+            renderAdminDashboard();
+        }
+
+        function renderAdminDashboard() {
+            document.getElementById('adminTotalVehicles').textContent = window.liveVehicles.length;
+            document.getElementById('adminPendingApps').textContent = window.liveAppointments.filter(a => a.status !== 'Completed').length;
+
+            const head = document.getElementById('adminTableHead');
+            const body = document.getElementById('adminTableBody');
+
+            if (currentAdminTab === 'vehicles') {
+                head.innerHTML = `<tr><th>Plate Number</th><th>Car Model</th><th>Mileage</th><th>Chassis / VIN</th><th>Owner Email</th></tr>`;
+                body.innerHTML = window.liveVehicles.map(v => `
+                    <tr>
+                        <td class="fw-bold text-primary">${v.plate}</td>
+                        <td>${v.brandModel}</td>
+                        <td>${v.mileage} km</td>
+                        <td><code>${v.vin}</code></td>
+                        <td>${v.ownerEmail}</td>
+                    </tr>
+                `).join('') || `<tr><td colspan="5" class="text-center py-3 text-muted">No vehicle data submitted yet.</td></tr>`;
+            } else {
+                head.innerHTML = `<tr><th>ID</th><th>Customer Name</th><th>Vehicle</th><th>Service</th><th>Status</th><th>Mechanic Assigned</th><th>Action</th></tr>`;
+                body.innerHTML = window.liveAppointments.map(a => `
+                    <tr>
+                        <td>#WO-${a.id}</td>
+                        <td>${a.customerName}</td>
+                        <td>${a.vehiclePlate}</td>
+                        <td>${a.service}</td>
+                        <td><span class="status-badge ${a.status === 'In Progress' ? 'status-in-progress' : 'status-pending'}">${a.status}</span></td>
+                        <td class="fw-bold text-success">${a.mechanicEmail || 'Unassigned'}</td>
+                        <td><button class="btn btn-sm btn-outline-primary" onclick="openAssignMechanicModal('${a.id}')">Assign Mechanic</button></td>
+                    </tr>
+                `).join('') || `<tr><td colspan="7" class="text-center py-3 text-muted">No appointments submitted yet.</td></tr>`;
+            }
+        }
+
+        function renderMechanicDashboard() {
+            const tbody = document.getElementById('mechanicTasksTableBody');
+            const myTasks = window.liveAppointments.filter(a => a.mechanicEmail && a.mechanicEmail.toLowerCase() === currentUser.email.toLowerCase());
+
+            tbody.innerHTML = myTasks.map(t => `
+                <tr>
+                    <td class="fw-bold">#WO-${t.id}</td>
+                    <td class="fw-bold text-primary">${t.vehiclePlate}</td>
+                    <td>${t.service}</td>
+                    <td>${t.customerName}</td>
+                    <td><span class="status-badge ${t.status === 'Completed' ? 'status-completed' : 'status-in-progress'}">${t.status}</span></td>
+                    <td><button class="btn btn-sm btn-success" onclick="completeJob('${t.id}')">Mark Complete</button></td>
+                </tr>
+            `).join('') || `<tr><td colspan="6" class="text-center py-4 text-muted">No assigned jobs found.</td></tr>`;
+        }
+
+        function renderCustomerDashboard() {
+            const myVehicles = window.liveVehicles.filter(v => v.ownerEmail && v.ownerEmail.toLowerCase() === currentUser.email.toLowerCase());
+            const select = document.getElementById('customerVehicleSelect');
+
+            if (myVehicles.length === 0) {
+                select.innerHTML = `<option>No Registered Vehicles Found</option>`;
+            } else {
+                select.innerHTML = myVehicles.map(v => `<option value="${v.plate}">${v.brandModel} (${v.plate})</option>`).join('');
+            }
+
+            const myApps = window.liveAppointments.filter(a => a.customerEmail && a.customerEmail.toLowerCase() === currentUser.email.toLowerCase());
+            document.getElementById('customerAppTableBody').innerHTML = myApps.map(a => `
+                <tr>
+                    <td>${a.date}</td>
+                    <td>${a.service}</td>
+                    <td><span class="status-badge ${a.status === 'In Progress' ? 'status-in-progress' : 'status-pending'}">${a.status}</span></td>
+                    <td>${a.mechanicEmail || 'Pending Assignment'}</td>
+                </tr>
+            `).join('') || `<tr><td colspan="4" class="text-center py-3 text-muted">No service bookings made yet.</td></tr>`;
+        }
+
+        function openAddVehicleModal() {
+            new bootstrap.Modal(document.getElementById('addVehicleModal')).show();
+        }
+
+        function submitAddVehicle(e) {
+            e.preventDefault();
+            const plate = document.getElementById('vehPlate').value.trim();
+            const brandModel = document.getElementById('vehBrandModel').value.trim();
+            const mileage = document.getElementById('vehMileage').value;
+            const vin = document.getElementById('vehVin').value.trim();
+
+            const newCar = { id: Date.now(), plate, brandModel, mileage, vin, ownerEmail: currentUser.email };
+
+            if (db) {
+                db.ref('vehicles').push(newCar);
+            } else {
+                window.liveVehicles.push(newCar);
+                refreshCurrentDashboard();
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('addVehicleModal')).hide();
+            showToast('Vehicle saved and synced across all devices!');
+        }
+
+        function openBookAppointmentModal() {
+            new bootstrap.Modal(document.getElementById('customerBookModal')).show();
+        }
+
+        function submitCustomerBooking(e) {
+            e.preventDefault();
+            const date = document.getElementById('bookDate').value;
+            const service = document.getElementById('bookServiceType').value;
+            const plateSelect = document.getElementById('customerVehicleSelect');
+
+            const newApt = {
+                id: Date.now(),
+                customerEmail: currentUser.email,
+                customerName: currentUser.name,
+                vehiclePlate: plateSelect.value || 'N/A',
+                service,
+                date,
+                status: 'Pending',
+                mechanicEmail: ''
+            };
+
+            if (db) {
+                db.ref('appointments').push(newApt);
+            } else {
+                window.liveAppointments.push(newApt);
+                refreshCurrentDashboard();
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('customerBookModal')).hide();
+            showToast('Appointment booked and sent to Admin!');
+        }
+
+        function openAssignMechanicModal(aptId) {
+            document.getElementById('assignAptId').value = aptId;
+            const select = document.getElementById('assignMechanicSelect');
+            select.innerHTML = `
+                <option value="mechanic@uptm.edu.my">Encik Kamal Rosli (mechanic@uptm.edu.my)</option>
+            `;
+            new bootstrap.Modal(document.getElementById('assignMechanicModal')).show();
+        }
+
+        function confirmAssignMechanic() {
+            const aptId = document.getElementById('assignAptId').value;
+            const mechEmail = document.getElementById('assignMechanicSelect').value;
+
+            if (db) {
+                db.ref('appointments').once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    for (let key in data) {
+                        if (data[key].id.toString() === aptId.toString()) {
+                            db.ref(`appointments/${key}`).update({
+                                mechanicEmail: mechEmail,
+                                status: 'In Progress'
+                            });
+                            break;
+                        }
+                    }
+                });
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('assignMechanicModal')).hide();
+            showToast('Assigned mechanic successfully!');
+        }
+
+        function completeJob(aptId) {
+            if (db) {
+                db.ref('appointments').once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    for (let key in data) {
+                        if (data[key].id.toString() === aptId.toString()) {
+                            db.ref(`appointments/${key}`).update({ status: 'Completed' });
+                            break;
+                        }
+                    }
+                });
+            }
+            showToast('Job marked as completed!');
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const el = document.createElement('div');
+            el.className = 'toast align-items-center text-white bg-dark border-0 show mb-2';
+            el.innerHTML = `<div class="d-flex"><div class="toast-body"><i class="fa-solid fa-circle-check text-success me-2"></i>${msg}</div></div>`;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
     </script>
 </body>
 </html>
