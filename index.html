@@ -778,45 +778,6 @@
         </div>
     </div>
 
-    <!-- FIREBASE SDKs (Modular Script Setup) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, child, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-        // CONFIG PANGKALAN DATA FIREBASE (Demo public URL / Gantikan dengan Config Firebase anda)
-        const firebaseConfig = {
-            databaseURL: "https://smartauto-ai-default-rtdb.asia-southeast1.firebasedatabase.app/"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // Global State Window Scope
-        window.db = db;
-        window.dbRef = ref(db);
-        window.dbSet = set;
-        window.dbGet = get;
-        window.dbChild = child;
-        window.dbPush = push;
-        window.dbOnValue = onValue;
-
-        // Realtime Listeners
-        onValue(ref(db, 'vehicles'), (snapshot) => {
-            window.liveVehicles = snapshot.val() ? Object.values(snapshot.val()) : [];
-            refreshCurrentDashboard();
-        });
-
-        onValue(ref(db, 'appointments'), (snapshot) => {
-            window.liveAppointments = snapshot.val() ? Object.values(snapshot.val()) : [];
-            refreshCurrentDashboard();
-        });
-
-        onValue(ref(db, 'users'), (snapshot) => {
-            window.liveUsers = snapshot.val() ? Object.values(snapshot.val()) : [];
-            refreshCurrentDashboard();
-        });
-    </script>
-
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
