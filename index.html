@@ -394,6 +394,7 @@
                     <div class="stat-card p-3 p-md-4 mb-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                             <h5 class="fw-bold mb-0" id="adminSectionTitle">Customer Accounts Management</h5>
+                            <div id="adminActionBtnContainer"></div>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
@@ -718,6 +719,65 @@
         </div>
     </div>
 
+    <!-- MODAL 6: ADD NEW SPARE PART MODAL (ADMIN) -->
+    <div class="modal fade" id="addSparePartModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Add New Spare Part Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSparePartForm" onsubmit="submitAddSparePart(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Part Name</label>
+                            <input type="text" class="form-control" id="partName" required placeholder="e.g. Oil Filter Honda Civic">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Initial Stock Quantity</label>
+                            <input type="number" class="form-control" id="partQty" required min="1" placeholder="e.g. 15">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Unit Price (RM)</label>
+                            <input type="number" step="0.01" class="form-control" id="partUnitPrice" required placeholder="e.g. 45.00">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-3">Add to Inventory</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 7: UPDATE SPARE PART STOCK MODAL (ADMIN) -->
+    <div class="modal fade" id="updateStockModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Update Spare Part Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateStockForm" onsubmit="submitUpdateStock(event)">
+                        <input type="hidden" id="editPartId">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Part Name</label>
+                            <input type="text" class="form-control bg-light" id="editPartName" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Stock Quantity</label>
+                            <input type="number" class="form-control" id="editPartQty" required min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Unit Price (RM)</label>
+                            <input type="number" step="0.01" class="form-control" id="editPartUnitPrice" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-3">Save Stock Updates</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1023,6 +1083,8 @@
             const head = document.getElementById('adminTableHead');
             const body = document.getElementById('adminTableBody');
             const title = document.getElementById('adminSectionTitle');
+            const actionBtn = document.getElementById('adminActionBtnContainer');
+            actionBtn.innerHTML = '';
 
             if (currentAdminTab === 'customers') {
                 title.textContent = 'Registered Customer Accounts';
@@ -1078,7 +1140,12 @@
                     </tr>
                 `).join('');
             } else if (currentAdminTab === 'parts') {
-                title.textContent = 'Spare Parts Inventory';
+                title.textContent = 'Spare Parts Inventory Management';
+                actionBtn.innerHTML = `
+                    <button class="btn btn-primary btn-sm rounded-3" onclick="openAddSparePartModal()">
+                        <i class="fa-solid fa-plus me-1"></i> Add New Spare Part
+                    </button>
+                `;
                 head.innerHTML = `<tr><th>Item ID</th><th>Part Name</th><th>Stock Qty</th><th>Unit Price</th><th>Action</th></tr>`;
                 body.innerHTML = spareParts.map(p => `
                     <tr>
@@ -1086,7 +1153,10 @@
                         <td>${p.name}</td>
                         <td><span class="fw-bold ${p.qty < 10 ? 'text-danger' : 'text-dark'}">${p.qty} units</span></td>
                         <td>RM ${p.unitPrice.toFixed(2)}</td>
-                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('spareParts', ${p.id})"><i class="fa-solid fa-trash"></i></button></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="openUpdateStockModal(${p.id})"><i class="fa-solid fa-pen-to-square"></i> Edit Stock</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('spareParts', ${p.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
                     </tr>
                 `).join('');
             }
@@ -1114,6 +1184,66 @@
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
+        }
+
+        // ==========================================
+        // SPARE PARTS MANAGEMENT LOGIC (ADMIN)
+        // ==========================================
+        function openAddSparePartModal() {
+            document.getElementById('addSparePartForm').reset();
+            const modal = new bootstrap.Modal(document.getElementById('addSparePartModal'));
+            modal.show();
+        }
+
+        async function submitAddSparePart(e) {
+            e.preventDefault();
+            const name = document.getElementById('partName').value.trim();
+            const qty = parseInt(document.getElementById('partQty').value);
+            const unitPrice = parseFloat(document.getElementById('partUnitPrice').value);
+
+            const newPart = {
+                id: Date.now(),
+                name,
+                qty,
+                unitPrice
+            };
+
+            await putRecord('spareParts', newPart);
+            bootstrap.Modal.getInstance(document.getElementById('addSparePartModal')).hide();
+            renderAdminDashboard();
+            showToast('New spare part item added successfully!');
+        }
+
+        async function openUpdateStockModal(partId) {
+            const spareParts = await getAllRecords('spareParts');
+            const part = spareParts.find(p => p.id === partId);
+            if (part) {
+                document.getElementById('editPartId').value = part.id;
+                document.getElementById('editPartName').value = part.name;
+                document.getElementById('editPartQty').value = part.qty;
+                document.getElementById('editPartUnitPrice').value = part.unitPrice;
+
+                const modal = new bootstrap.Modal(document.getElementById('updateStockModal'));
+                modal.show();
+            }
+        }
+
+        async function submitUpdateStock(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editPartId').value);
+            const qty = parseInt(document.getElementById('editPartQty').value);
+            const unitPrice = parseFloat(document.getElementById('editPartUnitPrice').value);
+
+            const spareParts = await getAllRecords('spareParts');
+            const part = spareParts.find(p => p.id === id);
+            if (part) {
+                part.qty = qty;
+                part.unitPrice = unitPrice;
+                await putRecord('spareParts', part);
+                bootstrap.Modal.getInstance(document.getElementById('updateStockModal')).hide();
+                renderAdminDashboard();
+                showToast('Spare part stock updated!');
+            }
         }
 
         async function openAssignMechanicModal(aptId) {
