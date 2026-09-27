@@ -862,8 +862,8 @@
                 { id: 502, customerEmail: 'siti@owner.com', customerName: 'Siti Nurhaliza', vehiclePlate: 'BQK 1920', service: 'Major Engine Service', date: '2026-10-05', status: 'Pending', mechanicEmail: '' }
             ],
             serviceRecords: [
-                { id: 901, date: '2026-08-14', vehiclePlate: 'VEE 8821', service: 'Synthetic Oil Change', mileage: 58000, notes: 'Engine oil filter changed. Condition optimal.', cost: 250, status: 'Completed' },
-                { id: 902, date: '2026-05-10', vehiclePlate: 'VEE 8821', service: 'Transmission Fluid Flush', mileage: 48000, notes: 'Transmission fluid replaced.', cost: 380, status: 'Completed' }
+                { id: 901, date: '2026-08-14', vehiclePlate: 'VEE 8821', service: 'Synthetic Oil Change', mileage: 58000, notes: 'Engine oil filter changed. Condition optimal.', cost: 250, status: 'Completed', mechanicEmail: 'mechanic@uptm.edu.my' },
+                { id: 902, date: '2026-05-10', vehiclePlate: 'VEE 8821', service: 'Transmission Fluid Flush', mileage: 48000, notes: 'Transmission fluid replaced.', cost: 380, status: 'Completed', mechanicEmail: 'mechanic@uptm.edu.my' }
             ],
             spareParts: [
                 { id: 1, name: 'Fully Synthetic Oil 5W-30', qty: 24, unitPrice: 180 },
@@ -1350,19 +1350,28 @@
         async function renderMechanicDashboard() {
             const appointments = await getAllRecords('appointments');
             const serviceRecords = await getAllRecords('serviceRecords');
-            const myTasks = appointments.filter(a => a.mechanicEmail.toLowerCase() === currentUser.email.toLowerCase());
+            
+            // Filter all appointments assigned to the logged-in mechanic
+            const myAssignedJobs = appointments.filter(a => a.mechanicEmail && a.mechanicEmail.toLowerCase() === currentUser.email.toLowerCase());
 
-            document.getElementById('mechAssignedCount').textContent = myTasks.length;
-            document.getElementById('mechInProgressCount').textContent = myTasks.filter(a => a.status === 'In Progress').length;
-            document.getElementById('mechCompletedCount').textContent = serviceRecords.length;
+            // Count jobs currently in progress assigned to this mechanic
+            const inProgressJobs = myAssignedJobs.filter(a => a.status === 'In Progress');
+
+            // Count jobs completed specifically by this mechanic (from appointments or service records)
+            const completedByMe = serviceRecords.filter(r => r.mechanicEmail && r.mechanicEmail.toLowerCase() === currentUser.email.toLowerCase()).length 
+                + myAssignedJobs.filter(a => a.status === 'Completed').length;
+
+            document.getElementById('mechAssignedCount').textContent = myAssignedJobs.length;
+            document.getElementById('mechInProgressCount').textContent = inProgressJobs.length;
+            document.getElementById('mechCompletedCount').textContent = completedByMe;
 
             const tbody = document.getElementById('mechanicTasksTableBody');
-            if (myTasks.length === 0) {
+            if (myAssignedJobs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No active work orders assigned to your account.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = myTasks.map(t => `
+            tbody.innerHTML = myAssignedJobs.map(t => `
                 <tr>
                     <td class="fw-bold">#WO-${t.id}</td>
                     <td>${t.vehiclePlate}</td>
@@ -1466,7 +1475,8 @@
                         mileage: 65000,
                         notes: formattedNotes,
                         cost: totalPartsCost + 120, // Base labor charge + total parts cost
-                        status: 'Completed'
+                        status: 'Completed',
+                        mechanicEmail: currentUser.email
                     });
 
                     const veh = vehicles.find(v => v.plate.trim().toLowerCase() === apt.vehiclePlate.trim().toLowerCase());
