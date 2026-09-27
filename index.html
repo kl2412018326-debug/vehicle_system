@@ -147,7 +147,6 @@
         .status-pending { background-color: #fef3c7; color: #d97706; }
         .status-in-progress { background-color: #e0f2fe; color: #0284c7; }
         .status-completed { background-color: #dcfce7; color: #16a34a; }
-        .status-danger { background-color: #fee2e2; color: #dc2626; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -239,7 +238,6 @@
                         <div class="mb-2">
                             <label class="form-label small fw-bold text-danger"><i class="fa-solid fa-shield-halved me-1"></i> Admin Security Code</label>
                             <input type="password" class="form-control bg-white" id="regAdminKey" placeholder="Enter key (Default: UPTM2026)">
-                            <small class="text-muted" style="font-size: 0.68rem;">* Use <b>UPTM2026</b> or <b>ADMIN123</b> to authorize admin registration.</small>
                         </div>
                         <div class="mb-0">
                             <label class="form-label small fw-bold text-danger"><i class="fa-solid fa-warehouse me-1"></i> Workshop / Branch Name</label>
@@ -265,7 +263,6 @@
 
     <!-- MAIN APPLICATION WRAPPER -->
     <div id="appContainer" class="d-none">
-        
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-2 px-3">
             <div class="container-fluid">
                 <a class="navbar-brand d-flex align-items-center gap-2" href="#">
@@ -289,9 +286,9 @@
                             <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2">
-                            <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#" onclick="openProfileModal()"><i class="fa-solid fa-user-gear text-primary"></i> Edit Profile Settings</a></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#" onclick="openProfileModal()"><i class="fa-solid fa-user-gear text-primary"></i> Profile Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out Account</a></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a></li>
                         </ul>
                     </div>
                 </div>
@@ -438,8 +435,7 @@
                             <div class="icon-shape bg-primary text-white"><i class="fa-solid fa-car"></i></div>
                             <div>
                                 <small class="text-muted d-block fw-bold" style="font-size: 0.7rem;">MY GARAGE VEHICLE</small>
-                                <select class="form-select border-0 bg-transparent fw-bold fs-5 p-0 pe-4" id="customerVehicleSelect" onchange="switchCustomerVehicle(this.value)">
-                                </select>
+                                <select class="form-select border-0 bg-transparent fw-bold fs-5 p-0 pe-4" id="customerVehicleSelect" onchange="switchCustomerVehicle(this.value)"></select>
                             </div>
                         </div>
                         <button class="btn btn-outline-primary btn-sm rounded-3" onclick="openAddVehicleModal()">
@@ -537,263 +533,40 @@
         </div>
     </div>
 
-    <!-- MODALS -->
-    <!-- Profile Modal -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold">Personal Profile Settings</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="profileForm" onsubmit="saveProfileSettings(event)">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Full Name</label>
-                            <input type="text" class="form-control" id="profileName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Email Address</label>
-                            <input type="email" class="form-control" id="profileEmail" required readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Phone Number</label>
-                            <input type="text" class="form-control" id="profilePhone" required>
-                        </div>
-                        <div class="mb-3" id="profileBranchContainer">
-                            <label class="form-label small fw-bold">Workshop / Branch Name</label>
-                            <input type="text" class="form-control" id="profileBranch">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Account Role</label>
-                            <input type="text" class="form-control bg-light" id="profileRole" readonly>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 rounded-3">Update Personal Details</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Vehicle Modal -->
-    <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold">Register Vehicle to My Account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addVehicleForm" onsubmit="submitAddVehicle(event)">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">License Plate Number</label>
-                            <input type="text" class="form-control" id="vehPlate" required placeholder="e.g. VEE 8821">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Brand & Model</label>
-                            <input type="text" class="form-control" id="vehBrandModel" required placeholder="e.g. Honda Civic 1.5 Turbo">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Current Odometer Mileage (km)</label>
-                            <input type="number" class="form-control" id="vehMileage" required placeholder="65000">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">VIN / Chassis Number</label>
-                            <input type="text" class="form-control" id="vehVin" required placeholder="e.g. WBA334812904812">
-                        </div>
-                        <button type="submit" class="btn btn-success w-100 rounded-3">Add Vehicle to Garage</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Assign Mechanic Modal -->
-    <div class="modal fade" id="assignMechanicModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold">Assign Mechanic to Job</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="assignAptId">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Select Workshop Mechanic</label>
-                        <select class="form-select" id="assignMechanicSelect"></select>
-                    </div>
-                </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-primary btn-sm rounded-3" onclick="confirmAssignMechanic()">Assign Job</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mechanic Work Order Update Modal (Updated with Multi-Select Spare Parts) -->
-    <div class="modal fade" id="mechanicModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold">Update Repair & Service Finding</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="mechanicUpdateForm">
-                        <input type="hidden" id="mechTaskId">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Job Status</label>
-                            <select class="form-select" id="mechStatusSelect">
-                                <option value="In Progress">In Progress</option>
-                                <option value="Pending Parts">Pending Parts</option>
-                                <option value="Completed">Completed</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Diagnostic Findings / Notes</label>
-                            <textarea class="form-control" id="mechNotes" rows="3" placeholder="Enter engine diagnostic findings..."></textarea>
-                        </div>
-
-                        <!-- Dynamic Multi-Select Spare Parts List -->
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Spare Parts Used</label>
-                            <div id="mechPartsContainer"></div>
-                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addPartRowMechanic()">
-                                <i class="fa-solid fa-plus me-1"></i> Add Another Spare Part
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-success btn-sm rounded-3" onclick="saveMechanicUpdate()">Save & Log Service</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Book Service Modal -->
-    <div class="modal fade" id="customerBookModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold">Book Service Appointment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="bookAppForm">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Preferred Date</label>
-                            <input type="date" class="form-control" id="bookDate" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Service Package</label>
-                            <select class="form-select" id="bookServiceType">
-                                <option value="Synthetic Oil Change">Synthetic Oil Change (RM 250)</option>
-                                <option value="Brake System Inspection">Brake System Inspection (RM 480)</option>
-                                <option value="Major Engine Service">Major Engine Service (RM 850)</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-primary btn-sm rounded-3" onclick="submitCustomerBooking()">Confirm Appointment</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Spare Part Modal -->
-    <div class="modal fade" id="addSparePartModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold">Add New Spare Part Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addSparePartForm" onsubmit="submitAddSparePart(event)">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Part Name</label>
-                            <input type="text" class="form-control" id="partName" required placeholder="e.g. Oil Filter Honda Civic">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Initial Stock Quantity</label>
-                            <input type="number" class="form-control" id="partQty" required min="1" placeholder="e.g. 15">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Unit Price (RM)</label>
-                            <input type="number" step="0.01" class="form-control" id="partUnitPrice" required placeholder="e.g. 45.00">
-                        </div>
-                        <button type="submit" class="btn btn-success w-100 rounded-3">Add to Inventory</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Update Spare Part Stock Modal -->
-    <div class="modal fade" id="updateStockModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold">Update Spare Part Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="updateStockForm" onsubmit="submitUpdateStock(event)">
-                        <input type="hidden" id="editPartId">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Part Name</label>
-                            <input type="text" class="form-control bg-light" id="editPartName" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Stock Quantity</label>
-                            <input type="number" class="form-control" id="editPartQty" required min="0">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Unit Price (RM)</label>
-                            <input type="number" step="0.01" class="form-control" id="editPartUnitPrice" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 rounded-3">Save Stock Updates</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- FRONT-END APP JS DATA & LOGIC -->
     <script>
+        // Mock State Replacing Backend PHP Database Collections
         let currentUser = null;
-        let dbState = { users: [], vehicles: [], appointments: [], serviceRecords: [], spareParts: [] };
+        let dbState = {
+            users: [
+                { id: 1, name: "Admin Manager", email: "admin@uptm.edu.my", phone: "011-1234567", role: "admin", branch: "UPTM Main Auto Workshop" },
+                { id: 2, name: "John Mechanic", email: "mechanic@uptm.edu.my", phone: "012-9876543", role: "mechanic", specialty: "Engine & Diagnostics" },
+                { id: 3, name: "Ahmad Customer", email: "customer@uptm.edu.my", phone: "019-3334444", role: "customer", branch: null }
+            ],
+            vehicles: [
+                { id: 1, plate: "VEE 8821", brand_model: "Honda Civic 1.5 Turbo", mileage: 65000, vin: "WBA334812904812", owner_email: "customer@uptm.edu.my", health_score: 92 }
+            ],
+            appointments: [
+                { id: 101, customer_name: "Ahmad Customer", customer_email: "customer@uptm.edu.my", vehicle_plate: "VEE 8821", service: "Synthetic Oil Change", appointment_date: "2026-10-01", status: "Pending", mechanic_email: "mechanic@uptm.edu.my" }
+            ],
+            serviceRecords: [
+                { id: 1, record_date: "2026-08-15", vehicle_plate: "VEE 8821", service: "Full Synthetic Oil & Filter Service", mileage: 60000, notes: "Engine oil, oil filter, and cabin filter replaced.", cost: 250.00, status: "Completed" }
+            ],
+            spareParts: [
+                { id: 1, name: "Synthetic Oil 4L", qty: 25, unit_price: 150.00 },
+                { id: 2, name: "Oil Filter Honda", qty: 40, unit_price: 35.00 }
+            ]
+        };
+
         let currentAdminTab = 'customers';
         let selectedCustomerPlate = '';
 
         let revenueChartInstance = null;
         let healthChartInstance = null;
         let gaugeChartInstance = null;
-
-        window.onload = async function() {
-            await fetchDashboardData();
-        };
-
-        async function fetchDashboardData() {
-            const res = await fetch('actions.php?action=get_dashboard_data');
-            const data = await res.json();
-            if (data.success) {
-                currentUser = data.currentUser;
-                dbState.users = data.users;
-                dbState.vehicles = data.vehicles;
-                dbState.appointments = data.appointments;
-                dbState.serviceRecords = data.serviceRecords;
-                dbState.spareParts = data.spareParts;
-                showAppDashboard();
-            } else {
-                document.getElementById('authScreen').classList.remove('d-none');
-                document.getElementById('appContainer').classList.add('d-none');
-            }
-        }
 
         function toggleAuthMode(mode) {
             if (mode === 'register') {
@@ -820,53 +593,45 @@
             handleLogin(new Event('submit'));
         }
 
-        async function handleLogin(e) {
-            if(e) e.preventDefault();
+        function handleLogin(e) {
+            if (e) e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
+            
+            const user = dbState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
 
-            const res = await fetch('actions.php?action=login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                await fetchDashboardData();
-                showToast(`Welcome back, ${data.user.name}!`);
+            if (user) {
+                currentUser = user;
+                showAppDashboard();
+                showToast(`Welcome back, ${currentUser.name}!`);
             } else {
-                alert(data.message || 'Invalid email or password.');
+                alert('Invalid user credentials.');
             }
         }
 
-        async function handleRegistration(e) {
+        function handleRegistration(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const role = document.getElementById('regRole').value;
-            const password = document.getElementById('regPassword').value;
-            const adminKey = document.getElementById('regAdminKey').value.trim();
             const branch = document.getElementById('regBranch').value.trim();
 
-            const res = await fetch('actions.php?action=register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, phone, role, password, adminKey, branch })
-            });
-            const data = await res.json();
+            const newUser = {
+                id: dbState.users.length + 1,
+                name,
+                email,
+                phone,
+                role,
+                branch: branch || null
+            };
 
-            if (data.success) {
-                await fetchDashboardData();
-                showToast(`Account registered successfully!`);
-            } else {
-                alert(data.message);
-            }
+            dbState.users.push(newUser);
+            currentUser = newUser;
+            showAppDashboard();
+            showToast('Account registered successfully!');
         }
 
-        async function handleLogout() {
-            await fetch('actions.php?action=logout');
+        function handleLogout() {
             currentUser = null;
             document.getElementById('appContainer').classList.add('d-none');
             document.getElementById('authScreen').classList.remove('d-none');
@@ -918,7 +683,6 @@
                 html = `
                     <div class="px-3 mb-2 text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Vehicle Owner Portal</div>
                     <a class="nav-link-custom active" href="#"><i class="fa-solid fa-gauge-high"></i> Dashboard & Diagnostics</a>
-                    <a class="nav-link-custom" href="#" onclick="openBookAppointmentModal()"><i class="fa-solid fa-calendar-plus"></i> Book Service</a>
                 `;
             }
 
@@ -947,24 +711,21 @@
             const head = document.getElementById('adminTableHead');
             const body = document.getElementById('adminTableBody');
             const title = document.getElementById('adminSectionTitle');
-            const actionBtn = document.getElementById('adminActionBtnContainer');
-            actionBtn.innerHTML = '';
 
             if (currentAdminTab === 'customers') {
                 title.textContent = 'Registered Customer Accounts';
-                head.innerHTML = `<tr><th>User ID</th><th>Customer Name</th><th>Email</th><th>Phone</th><th>Action</th></tr>`;
+                head.innerHTML = `<tr><th>User ID</th><th>Customer Name</th><th>Email</th><th>Phone</th></tr>`;
                 body.innerHTML = dbState.users.filter(u => u.role === 'customer').map(c => `
                     <tr>
                         <td class="fw-bold">#CST-${c.id}</td>
                         <td>${c.name}</td>
                         <td>${c.email}</td>
                         <td>${c.phone || '-'}</td>
-                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('users', ${c.id})"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `).join('');
             } else if (currentAdminTab === 'vehicles') {
                 title.textContent = 'Fleet Vehicle Registry';
-                head.innerHTML = `<tr><th>Plate</th><th>Model</th><th>Mileage</th><th>AI Health Score</th><th>Owner Email</th><th>Action</th></tr>`;
+                head.innerHTML = `<tr><th>Plate</th><th>Model</th><th>Mileage</th><th>AI Health Score</th><th>Owner Email</th></tr>`;
                 body.innerHTML = dbState.vehicles.map(v => `
                     <tr>
                         <td class="fw-bold">${v.plate}</td>
@@ -972,58 +733,6 @@
                         <td>${parseInt(v.mileage).toLocaleString()} km</td>
                         <td><span class="badge ${v.health_score > 80 ? 'bg-success' : 'bg-warning text-dark'}">${v.health_score}%</span></td>
                         <td>${v.owner_email}</td>
-                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('vehicles', ${v.id})"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                `).join('');
-            } else if (currentAdminTab === 'mechanics') {
-                title.textContent = 'Mechanic Staff Roster';
-                head.innerHTML = `<tr><th>ID</th><th>Mechanic Name</th><th>Email</th><th>Specialty</th><th>Action</th></tr>`;
-                body.innerHTML = dbState.users.filter(u => u.role === 'mechanic').map(m => `
-                    <tr>
-                        <td class="fw-bold">#MCH-${m.id}</td>
-                        <td>${m.name}</td>
-                        <td>${m.email}</td>
-                        <td>${m.specialty || 'General Diagnostics'}</td>
-                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('users', ${m.id})"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                `).join('');
-            } else if (currentAdminTab === 'appointments') {
-                title.textContent = 'Service Appointments & Assignments';
-                head.innerHTML = `<tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Service</th><th>Assigned Mechanic</th><th>Status</th><th>Action</th></tr>`;
-                body.innerHTML = dbState.appointments.map(a => {
-                    const statusVal = a.status || 'Pending';
-                    const statusClass = statusVal === 'Completed' ? 'status-completed' : (statusVal === 'In Progress' ? 'status-in-progress' : 'status-pending');
-                    return `
-                    <tr>
-                        <td class="fw-bold">#APT-${a.id}</td>
-                        <td>${a.customer_name}</td>
-                        <td>${a.vehicle_plate}</td>
-                        <td>${a.service}</td>
-                        <td><span class="fw-bold text-primary">${a.mechanic_email || 'Unassigned'}</span></td>
-                        <td><span class="status-badge ${statusClass}">${statusVal}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="openAssignMechanicModal(${a.id})"><i class="fa-solid fa-user-plus"></i> Assign</button>
-                        </td>
-                    </tr>
-                `}).join('');
-            } else if (currentAdminTab === 'parts') {
-                title.textContent = 'Spare Parts Inventory Management';
-                actionBtn.innerHTML = `
-                    <button class="btn btn-primary btn-sm rounded-3" onclick="openAddSparePartModal()">
-                        <i class="fa-solid fa-plus me-1"></i> Add New Spare Part
-                    </button>
-                `;
-                head.innerHTML = `<tr><th>Item ID</th><th>Part Name</th><th>Stock Qty</th><th>Unit Price</th><th>Action</th></tr>`;
-                body.innerHTML = dbState.spareParts.map(p => `
-                    <tr>
-                        <td class="fw-bold">#PRT-${p.id}</td>
-                        <td>${p.name}</td>
-                        <td><span class="fw-bold ${p.qty < 10 ? 'text-danger' : 'text-dark'}">${p.qty} units</span></td>
-                        <td>RM ${parseFloat(p.unit_price).toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" onclick="openUpdateStockModal(${p.id})"><i class="fa-solid fa-pen-to-square"></i> Edit Stock</button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRecord('spareParts', ${p.id})"><i class="fa-solid fa-trash"></i></button>
-                        </td>
                     </tr>
                 `).join('');
             }
@@ -1053,97 +762,6 @@
             });
         }
 
-        function openAddSparePartModal() {
-            document.getElementById('addSparePartForm').reset();
-            const modal = new bootstrap.Modal(document.getElementById('addSparePartModal'));
-            modal.show();
-        }
-
-        async function submitAddSparePart(e) {
-            e.preventDefault();
-            const name = document.getElementById('partName').value.trim();
-            const qty = parseInt(document.getElementById('partQty').value);
-            const unitPrice = parseFloat(document.getElementById('partUnitPrice').value);
-
-            await fetch('actions.php?action=add_spare_part', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, qty, unitPrice })
-            });
-
-            bootstrap.Modal.getInstance(document.getElementById('addSparePartModal')).hide();
-            await fetchDashboardData();
-            showToast('New spare part item added successfully!');
-        }
-
-        function openUpdateStockModal(partId) {
-            const part = dbState.spareParts.find(p => p.id == partId);
-            if (part) {
-                document.getElementById('editPartId').value = part.id;
-                document.getElementById('editPartName').value = part.name;
-                document.getElementById('editPartQty').value = part.qty;
-                document.getElementById('editPartUnitPrice').value = part.unit_price;
-
-                const modal = new bootstrap.Modal(document.getElementById('updateStockModal'));
-                modal.show();
-            }
-        }
-
-        async function submitUpdateStock(e) {
-            e.preventDefault();
-            const id = parseInt(document.getElementById('editPartId').value);
-            const qty = parseInt(document.getElementById('editPartQty').value);
-            const unitPrice = parseFloat(document.getElementById('editPartUnitPrice').value);
-
-            await fetch('actions.php?action=update_spare_part', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, qty, unitPrice })
-            });
-
-            bootstrap.Modal.getInstance(document.getElementById('updateStockModal')).hide();
-            await fetchDashboardData();
-            showToast('Spare part stock updated!');
-        }
-
-        function openAssignMechanicModal(aptId) {
-            document.getElementById('assignAptId').value = aptId;
-            const mechs = dbState.users.filter(u => u.role === 'mechanic');
-
-            const select = document.getElementById('assignMechanicSelect');
-            select.innerHTML = mechs.map(m => `<option value="${m.email}">${m.name} (${m.email})</option>`).join('');
-
-            const modal = new bootstrap.Modal(document.getElementById('assignMechanicModal'));
-            modal.show();
-        }
-
-        async function confirmAssignMechanic() {
-            const aptId = parseInt(document.getElementById('assignAptId').value);
-            const mechanicEmail = document.getElementById('assignMechanicSelect').value;
-
-            await fetch('actions.php?action=assign_mechanic', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ aptId, mechanicEmail })
-            });
-
-            bootstrap.Modal.getInstance(document.getElementById('assignMechanicModal')).hide();
-            await fetchDashboardData();
-            showToast('Mechanic assigned successfully!');
-        }
-
-        async function deleteAdminRecord(table, id) {
-            if (!confirm('Are you sure you want to delete this record?')) return;
-            await fetch('actions.php?action=delete_record', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ table, id })
-            });
-
-            await fetchDashboardData();
-            showToast('Record deleted successfully.');
-        }
-
         function renderMechanicDashboard() {
             const myTasks = dbState.appointments.filter(a => a.mechanic_email && a.mechanic_email.toLowerCase() === currentUser.email.toLowerCase());
 
@@ -1167,76 +785,9 @@
                     <td>${t.service}</td>
                     <td>${t.customer_name}</td>
                     <td><span class="status-badge ${statusClass}">${statusVal}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary rounded-3" onclick="openMechanicUpdateModal(${t.id})"><i class="fa-solid fa-wrench me-1"></i> Update Progress</button>
-                    </td>
+                    <td><button class="btn btn-sm btn-primary rounded-3">Update</button></td>
                 </tr>
             `}).join('');
-        }
-
-        // Dynamic Spare Part Rows Helpers
-        function getSparePartOptionsHtml() {
-            return `<option value="">-- Select Spare Part --</option>` +
-                dbState.spareParts.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.qty}) - RM ${parseFloat(p.unit_price).toFixed(2)}</option>`).join('');
-        }
-
-        function addPartRowMechanic() {
-            const container = document.getElementById('mechPartsContainer');
-            const row = document.createElement('div');
-            row.className = 'row g-2 mb-2 mech-part-row align-items-center';
-            row.innerHTML = `
-                <div class="col-7">
-                    <select class="form-select mech-part-select">${getSparePartOptionsHtml()}</select>
-                </div>
-                <div class="col-3">
-                    <input type="number" class="form-control mech-part-qty" value="1" min="1" placeholder="Qty">
-                </div>
-                <div class="col-2">
-                    <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.mech-part-row').remove()"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `;
-            container.appendChild(row);
-        }
-
-        function openMechanicUpdateModal(taskId) {
-            document.getElementById('mechTaskId').value = taskId;
-            document.getElementById('mechNotes').value = '';
-            
-            const container = document.getElementById('mechPartsContainer');
-            container.innerHTML = '';
-            addPartRowMechanic(); // add initial row
-
-            const modal = new bootstrap.Modal(document.getElementById('mechanicModal'));
-            modal.show();
-        }
-
-        async function saveMechanicUpdate() {
-            const taskId = parseInt(document.getElementById('mechTaskId').value);
-            const status = document.getElementById('mechStatusSelect').value;
-            const notes = document.getElementById('mechNotes').value;
-
-            // Collect all selected parts
-            const partRows = document.querySelectorAll('.mech-part-row');
-            const partsUsed = [];
-
-            partRows.forEach(row => {
-                const partId = parseInt(row.querySelector('.mech-part-select').value);
-                const quantity = parseInt(row.querySelector('.mech-part-qty').value) || 1;
-
-                if (partId) {
-                    partsUsed.push({ partId, quantity });
-                }
-            });
-
-            await fetch('actions.php?action=update_mechanic_task', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ taskId, status, notes, partsUsed })
-            });
-
-            bootstrap.Modal.getInstance(document.getElementById('mechanicModal')).hide();
-            await fetchDashboardData();
-            showToast('Work order updated successfully!');
         }
 
         function renderCustomerDashboard() {
@@ -1245,19 +796,13 @@
             const select = document.getElementById('customerVehicleSelect');
             if (myVehicles.length === 0) {
                 select.innerHTML = `<option value="">No Registered Vehicles</option>`;
-                document.getElementById('healthScoreValue').textContent = 'N/A';
-                document.getElementById('qrVinDisplay').textContent = 'VIN: NONE';
                 return;
             }
 
-            select.innerHTML = myVehicles.map(v => `<option value="${v.plate}" ${v.plate === selectedCustomerPlate ? 'selected' : ''}>${v.brand_model} (${v.plate})</option>`).join('');
+            select.innerHTML = myVehicles.map(v => `<option value="${v.plate}">${v.brand_model} (${v.plate})</option>`).join('');
+            selectedCustomerPlate = myVehicles[0].plate;
+            const activeVeh = myVehicles[0];
 
-            if (!selectedCustomerPlate || !myVehicles.some(v => v.plate === selectedCustomerPlate)) {
-                selectedCustomerPlate = myVehicles[0].plate;
-            }
-
-            const activeVeh = myVehicles.find(v => v.plate === selectedCustomerPlate);
-            
             initHealthGauge(activeVeh.health_score);
             renderComponentBreakdown(activeVeh.health_score);
             updateQrCode(activeVeh.vin);
@@ -1340,76 +885,6 @@
         function calculateEstimate() {
             const val = document.getElementById('costEstimatorSelect').value;
             document.getElementById('estimatedCostDisplay').textContent = `RM ${parseFloat(val).toFixed(2)}`;
-        }
-
-        function openAddVehicleModal() {
-            const modal = new bootstrap.Modal(document.getElementById('addVehicleModal'));
-            modal.show();
-        }
-
-        async function submitAddVehicle(e) {
-            e.preventDefault();
-            const plate = document.getElementById('vehPlate').value.trim();
-            const brandModel = document.getElementById('vehBrandModel').value.trim();
-            const mileage = parseInt(document.getElementById('vehMileage').value);
-            const vin = document.getElementById('vehVin').value.trim();
-
-            await fetch('actions.php?action=add_vehicle', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plate, brandModel, mileage, vin })
-            });
-
-            selectedCustomerPlate = plate;
-            bootstrap.Modal.getInstance(document.getElementById('addVehicleModal')).hide();
-            await fetchDashboardData();
-            showToast('Vehicle registered to your garage!');
-        }
-
-        function openBookAppointmentModal() {
-            const modal = new bootstrap.Modal(document.getElementById('customerBookModal'));
-            modal.show();
-        }
-
-        async function submitCustomerBooking() {
-            const date = document.getElementById('bookDate').value;
-            const service = document.getElementById('bookServiceType').value;
-
-            if (!date) { alert('Please pick a preferred date'); return; }
-
-            await fetch('actions.php?action=book_appointment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ vehiclePlate: selectedCustomerPlate, service, date })
-            });
-
-            bootstrap.Modal.getInstance(document.getElementById('customerBookModal')).hide();
-            await fetchDashboardData();
-            showToast('Appointment booked successfully!');
-        }
-
-        function openProfileModal() {
-            document.getElementById('profileName').value = currentUser.name;
-            document.getElementById('profileEmail').value = currentUser.email;
-            document.getElementById('profilePhone').value = currentUser.phone || '';
-            document.getElementById('profileRole').value = currentUser.role.toUpperCase();
-
-            const branchContainer = document.getElementById('profileBranchContainer');
-            if (currentUser.role === 'admin') {
-                branchContainer.classList.remove('d-none');
-                document.getElementById('profileBranch').value = currentUser.branch || '';
-            } else {
-                branchContainer.classList.add('d-none');
-            }
-
-            const modal = new bootstrap.Modal(document.getElementById('profileModal'));
-            modal.show();
-        }
-
-        async function saveProfileSettings(e) {
-            e.preventDefault();
-            bootstrap.Modal.getInstance(document.getElementById('profileModal')).hide();
-            showToast('Profile settings saved!');
         }
 
         function showToast(msg) {
